@@ -38,8 +38,8 @@ const typeDefs = gql`
     }
 
     type UsersResponse {
-        users: [User]!
-        userCount: Int!
+        records: [User]!
+        count: Int!
     }
     
     type LoginResponse {

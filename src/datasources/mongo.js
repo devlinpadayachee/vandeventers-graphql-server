@@ -28,13 +28,12 @@ class mongoAPI extends DataSource {
 
   async users(limit = 10, skip = 0, query = {}) {
     try {
-      const userCount = await this.User.where(query).countDocuments();
-      if (skip >= userCount) {
+      const count = await this.User.where(query).countDocuments();
+      if (skip >= count) {
         skip = 0;
       }
-      const users = await this.User.find(query).limit(limit).skip(skip);
-      console.log(users);
-      return users.length > 0 ? { users, userCount } : { users : [], userCount: 0 };
+      const records = await this.User.find(query).limit(limit).skip(skip);
+      return records.length > 0 ? { records, count } : { records : [], count: 0 };
     } catch(e){
       console.log('Oops Something went wrong');
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});

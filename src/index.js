@@ -6,8 +6,10 @@ const {
 const { applyMiddleware } = require ('graphql-middleware');
 const BaseTypeDef = require ('./schemas/base');
 const UserTypeDef = require ('./schemas/user');
+const PostTypeDef = require ('./schemas/post');
 const BaseResolver = require('./resolvers/base');
 const UserResolver = require('./resolvers/user');
+const PostResolver = require('./resolvers/post');
 const permissions = require('./permissions');
 
 const { createMongoInstance, verifyToken } = require('./utils');
@@ -18,8 +20,8 @@ const mongoInstance = createMongoInstance();
 
 const schema = applyMiddleware(
     makeExecutableSchema({
-        typeDefs: [ BaseTypeDef, UserTypeDef ],
-        resolvers: _.merge( BaseResolver, UserResolver )
+        typeDefs: [ BaseTypeDef, UserTypeDef, PostTypeDef ],
+        resolvers: _.merge( BaseResolver, UserResolver, PostResolver )
     }),
     permissions
 );

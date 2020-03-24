@@ -3,6 +3,34 @@ const { Schema } = mongoose;
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 
+module.exports.paginateResults = ({
+  after: cursor,
+  pageSize = 20,
+  results,
+  // can pass in a function to calculate an item's cursor
+  getCursor = () => null,
+}) => {
+  if (pageSize < 1) return [];
+
+  if (!cursor) return results.slice(0, pageSize);
+  const cursorIndex = results.findIndex(item => {
+    // if an item has a `cursor` on it, use that, otherwise try to generate one
+    let itemCursor = item.cursor ? item.cursor : getCursor(item);
+
+    // if there's still not a cursor, return false by default
+    return itemCursor ? cursor === itemCursor : false;
+  });
+
+  return cursorIndex >= 0
+    ? cursorIndex === results.length - 1 // don't let us overflow
+      ? []
+      : results.slice(
+          cursorIndex + 1,
+          Math.min(results.length, cursorIndex + 1 + pageSize),
+        )
+    : results.slice(0, pageSize);
+};
+
 module.exports.createMongoInstance = () => {
   mongoose.set('useNewUrlParser', true);
   mongoose.set('useFindAndModify', false);
@@ -26,9 +54,20 @@ module.exports.createMongoInstance = () => {
     timestamps: { currentTime: () => Date.now() }
   });
   
-  const User = mongoose.model('User', userSchema); 
+  const postSchema = new Schema({
+    title: {type: String, required: true},
+    content: {type: String, required: true},
+    createdBy: {type: Schema.Types.ObjectId, required: true},
+    createdAt: Number,
+    updatedAt: Number,
+  },{
+    timestamps: { currentTime: () => Date.now() }
+  });
+  
+  const User = mongoose.model('User', userSchema);
+  const Post = mongoose.model('Post', postSchema);
  
-  return { User };
+  return { User, Post };
 };
 
 module.exports.getPasswordHash = (password) => {

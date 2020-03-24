@@ -12,9 +12,10 @@ const { paginateResults, getPasswordHash, getJWT } = require('../utils');
 
 module.exports = {
     Query: {
+        ping: (parent, args, context, info) => {
+            return "Im alive!"
+        },
         me: (parent, args, context, info) => {
-            console.log('parent',parent);
-            console.log('context',context);
             return context.user
         },
         user: async (parent, args, context, info) => {
@@ -36,13 +37,13 @@ module.exports = {
             return { user, token };
         },
         createUser: async (parent, args, context, info) => {
-            if (!isEmail.validate(args.email)) {
+            if (!isEmail.validate(args.user.email)) {
                 throw new UserInputError('Email is invalid', {
                     invalidArgs: ['email'],
                 });
             }
-            args.password = await getPasswordHash(args.password);
-            const user = await context.dataSources.mongoAPI.createUser(args);
+            args.user.password = await getPasswordHash(args.user.password);
+            const user = await context.dataSources.mongoAPI.createUser(args.user);
             if (user) return user;
             throw new ApolloError('Could not create user', 'ACTION_NOT_COMPLETED', {});
         },

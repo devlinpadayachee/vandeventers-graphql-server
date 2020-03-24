@@ -12,6 +12,7 @@ const typeDefs = gql`
     }
 
     type Query {
+        ping: String!
         me: User
         user(id:ID!): User
         users(limit:Int!, skip:Int!, query: JSON!): UsersResponse!
@@ -19,7 +20,7 @@ const typeDefs = gql`
 
     type Mutation {
         login(email: String!, password: String!): LoginResponse!
-        createUser(username: String!, password: String!, email: String!, role: Role! ): User 
+        createUser(user: UserCreateInput): User!
         updateUser(user: UserUpdateInput): UpdatedResponse! 
         deleteUser(id: ID!): DeletedResponse! 
     }
@@ -27,6 +28,13 @@ const typeDefs = gql`
     enum Role {
         admin
         user
+    }
+
+    input UserCreateInput {
+        username: String!
+        password: String!
+        email: String!
+        role: Role!
     }
 
     input UserUpdateInput {
@@ -47,17 +55,6 @@ const typeDefs = gql`
         token: String
     }
 
-    type UpdatedResponse {
-        id: ID!
-        updated: Boolean!
-        user: User!
-    }
-
-    type DeletedResponse {
-        id: ID!
-        deleted: Boolean!
-    }
-    
 `;
 
 module.exports = typeDefs;

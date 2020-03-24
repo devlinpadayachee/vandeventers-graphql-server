@@ -10,6 +10,7 @@ const { rule, shield, and, or, not } = require('graphql-shield');
 
 const isAuthenticated = rule({ cache: 'contextual' })(
     async (parent, args, context, info) => {
+        console.log(context);
         return context.user !== null ? true : new ApolloError("Not Authorized", 'NOT_AUTHORIZED')
     },
 )
@@ -22,30 +23,21 @@ const isAdmin = rule({ cache: 'contextual' })(
 
 module.exports = shield({
     Query: {
+        ping: not(isAuthenticated),
         me: isAuthenticated,
         user: isAuthenticated,
-        users: isAuthenticated,
+        post: isAuthenticated,
+        posts: isAuthenticated,
     },
     Mutation: { 
         login: not(isAuthenticated),
         createUser: and(isAuthenticated, isAdmin),
         updateUser: and(isAuthenticated, isAdmin),
         deleteUser: and(isAuthenticated, isAdmin),
+        createPost: and(isAuthenticated, isAdmin),
+        updatePost: and(isAuthenticated, isAdmin),
+        deletePost: and(isAuthenticated, isAdmin),
     },
 },{
     allowExternalErrors : true
 });
-
-
-// shield({
-//     Query: {
-//       frontPage: not(isAuthenticated),
-//       fruits: and(isAuthenticated, or(isAdmin, isEditor)),
-//       customers: and(isAuthenticated, isAdmin),
-//     },
-//     Mutation: {
-//       addFruitToBasket: isAuthenticated,
-//     },
-//     Fruit: isAuthenticated,
-//     Customer: isAdmin,
-//   })

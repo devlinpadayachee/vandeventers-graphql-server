@@ -25,6 +25,7 @@ module.exports = shield({
         ping: not(isAuthenticated),
         me: isAuthenticated,
         user: isAuthenticated,
+        users: isAuthenticated,
         post: isAuthenticated,
         posts: isAuthenticated,
     },

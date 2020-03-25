@@ -5,6 +5,11 @@ const typeDefs = gql`
     scalar JSON
     scalar JSONObject
 
+    enum Role {
+        admin
+        user
+    }
+
     type UpdatedResponse {
         id: ID!
         updated: Boolean!

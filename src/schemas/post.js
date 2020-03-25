@@ -22,6 +22,11 @@ const typeDefs = gql`
         deletePost(id: ID!): DeletedResponse! 
     }
 
+    type PostsResponse {
+        records: [Post]!
+        count: Int!
+    }
+    
     input PostCreateInput {
         title: String!
         content: String!
@@ -34,10 +39,6 @@ const typeDefs = gql`
         content: String
     }
 
-    type PostsResponse {
-        records: [Post]!
-        count: Int!
-    }
     
 `;
 

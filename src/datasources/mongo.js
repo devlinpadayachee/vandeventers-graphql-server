@@ -14,6 +14,7 @@ class mongoAPI extends DataSource {
   }
   
   initialize(config) {
+    
     this.context = config.context;
   }
 

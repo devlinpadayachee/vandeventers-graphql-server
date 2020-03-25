@@ -25,9 +25,9 @@ const typeDefs = gql`
         deleteUser(id: ID!): DeletedResponse! 
     }
 
-    enum Role {
-        admin
-        user
+    type UsersResponse {
+        records: [User]!
+        count: Int!
     }
 
     input UserCreateInput {
@@ -43,11 +43,6 @@ const typeDefs = gql`
         password: String
         email: String
         role: Role
-    }
-
-    type UsersResponse {
-        records: [User]!
-        count: Int!
     }
     
     type LoginResponse {

@@ -7,21 +7,24 @@ const { applyMiddleware } = require ('graphql-middleware');
 const BaseTypeDef = require ('./schemas/base');
 const UserTypeDef = require ('./schemas/user');
 const PostTypeDef = require ('./schemas/post');
+const SmappeeTypeDef = require ('./schemas/smappee');
 const BaseResolver = require('./resolvers/base');
 const UserResolver = require('./resolvers/user');
 const PostResolver = require('./resolvers/post');
+const SmappeeResolver = require ('./resolvers/smappee');
 const permissions = require('./permissions');
 
 const { createMongoInstance, verifyToken } = require('./utils');
 const _ = require('lodash');
 const mongoAPI = require('./datasources/mongo');
+const smappeeAPI = require('./datasources/smappee');
 
 const mongoInstance = createMongoInstance();
 
 const schema = applyMiddleware(
     makeExecutableSchema({
-        typeDefs: [ BaseTypeDef, UserTypeDef, PostTypeDef ],
-        resolvers: _.merge( BaseResolver, UserResolver, PostResolver )
+        typeDefs: [ BaseTypeDef, UserTypeDef, PostTypeDef, SmappeeTypeDef ],
+        resolvers: _.merge( BaseResolver, UserResolver, PostResolver, SmappeeResolver )
     }),
     permissions
 );
@@ -39,7 +42,8 @@ const server = new ApolloServer({
         return { user }
     },
     dataSources: () => ({
-        mongoAPI: new mongoAPI({ mongoInstance })
+        mongoAPI: new mongoAPI({ mongoInstance }),
+        smappeeAPI: new smappeeAPI({})
     }),
 });
 

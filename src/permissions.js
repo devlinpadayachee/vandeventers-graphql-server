@@ -10,7 +10,6 @@ const { rule, shield, and, or, not } = require('graphql-shield');
 
 const isAuthenticated = rule({ cache: 'contextual' })(
     async (parent, args, context, info) => {
-        console.log(context);
         return context.user !== null ? true : new ApolloError("Not Authorized", 'NOT_AUTHORIZED')
     },
 )

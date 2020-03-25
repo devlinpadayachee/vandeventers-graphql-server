@@ -10,12 +10,14 @@ class mongoAPI extends DataSource {
   constructor({ mongoInstance }) {
     super();
     this.User = mongoInstance.User;
+    this.Post = mongoInstance.Post;
   }
   
   initialize(config) {
     this.context = config.context;
   }
 
+  //Users
   async user(id) {
     try {
       const user = await this.User.findOne({ _id: id });
@@ -81,6 +83,64 @@ class mongoAPI extends DataSource {
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
+
+  //Posts
+  async post(id) {
+    try {
+      const post = await this.Post.findOne({ _id: id });
+      return post ? post : null;
+    } catch(e){
+      console.log('Oops Something went wrong with finding the post');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async posts(limit = 10, skip = 0, query = {}) {
+    try {
+      const count = await this.Post.where(query).countDocuments();
+      if (skip >= count) {
+        skip = 0;
+      }
+      const records = await this.Post.find(query).limit(limit).skip(skip);
+      return records.length > 0 ? { records, count } : { records : [], count: 0 };
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async createPost(args) {
+    try {
+      const post = await this.Post.create(args);
+      return post ? post : null;
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async updatePost(args) {
+    try {
+      const id = args.id
+      const updatedPost = await this.Post.findOneAndUpdate({ _id: id }, args, { new: true } );
+      return updatedPost ? { id, updated: true, post: updatedPost } : { id, updated: false, post: args };
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async deletePost(id) {
+    try {
+      const deletedPost = await this.Post.deleteOne({ _id: id });
+      return deletedPost.deletedCount > 0 ? { id, deleted: true } : { id, deleted: false };
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  
 }
 
 module.exports = mongoAPI;

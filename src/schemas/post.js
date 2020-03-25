@@ -11,12 +11,12 @@ const typeDefs = gql`
         updatedAt: Float!
     }
 
-    type Query {
+    extend type Query {
         post(id:ID!): Post
         posts(limit:Int!, skip:Int!, query: JSON!): PostsResponse!
     }
 
-    type Mutation {
+    extend type Mutation {
         createPost(post: PostCreateInput): Post!
         updatePost(post: PostUpdateInput): UpdatedResponse! 
         deletePost(id: ID!): DeletedResponse! 
@@ -25,6 +25,7 @@ const typeDefs = gql`
     input PostCreateInput {
         title: String!
         content: String!
+        createdBy: ID!
     }
 
     input PostUpdateInput {

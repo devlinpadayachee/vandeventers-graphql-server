@@ -8,7 +8,6 @@ const typeDefs = gql`
     type UpdatedResponse {
         id: ID!
         updated: Boolean!
-        user: User!
     }
 
     type DeletedResponse {

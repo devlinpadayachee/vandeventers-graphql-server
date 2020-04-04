@@ -1,3 +1,4 @@
+require('dotenv').config()
 const { 
     ApolloServer,
     makeExecutableSchema,
@@ -48,5 +49,5 @@ const server = new ApolloServer({
 });
 
 server.listen().then(({ url }) => {
-    console.log(`🚀 Server ready at ${url}`);
+    console.log(`Server ${JSON.stringify(process.env.APP_TITLE)} is ready at ${process.env.APP_HOST_URL}`);
 });

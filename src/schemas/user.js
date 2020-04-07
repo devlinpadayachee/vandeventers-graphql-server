@@ -7,6 +7,8 @@ const typeDefs = gql`
         username: String!
         email: String!
         role: Role!
+        pushToken: String
+        serviceLocations: JSON
         createdAt: Float!
         updatedAt: Float!
     }
@@ -43,6 +45,8 @@ const typeDefs = gql`
         password: String
         email: String
         role: Role
+        pushToken: String
+        serviceLocations: JSON
     }
     
     type LoginResponse {

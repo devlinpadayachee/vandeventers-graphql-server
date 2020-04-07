@@ -11,6 +11,8 @@ class mongoAPI extends DataSource {
     super();
     this.User = mongoInstance.User;
     this.Post = mongoInstance.Post;
+    this.Notification = mongoInstance.Notification;
+    this.Reason = mongoInstance.Reason;
   }
   
   initialize(config) {
@@ -57,7 +59,7 @@ class mongoAPI extends DataSource {
     try {
       const id = args.id
       const updatedUser = await this.User.findOneAndUpdate({ _id: id }, args, { new: true } );
-      return updatedUser ? { id, updated: true, user: updatedUser } : { id, updated: false, user: args };
+      return updatedUser ? { id, updated: true } : { id, updated: false };
     } catch(e){
       console.log('Oops Something went wrong');
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
@@ -124,7 +126,7 @@ class mongoAPI extends DataSource {
     try {
       const id = args.id
       const updatedPost = await this.Post.findOneAndUpdate({ _id: id }, args, { new: true } );
-      return updatedPost ? { id, updated: true, post: updatedPost } : { id, updated: false, post: args };
+      return updatedPost ? { id, updated: true } : { id, updated: false };
     } catch(e){
       console.log('Oops Something went wrong');
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
@@ -141,7 +143,117 @@ class mongoAPI extends DataSource {
     }
   }
 
-  
+  //Notifications
+  async notification(id) {
+    try {
+      const notification = await this.Notification.findOne({ _id: id });
+      return notification ? notification : null;
+    } catch(e){
+      console.log('Oops Something went wrong with finding the notification');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async notifications(limit = 10, skip = 0, query = {}) {
+    try {
+      const count = await this.Notification.where(query).countDocuments();
+      if (skip >= count) {
+        skip = 0;
+      }
+      const records = await this.Notification.find(query).limit(limit).skip(skip);
+      return records.length > 0 ? { records, count } : { records : [], count: 0 };
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async createNotification(args) {
+    try {
+      const notification = await this.Notification.create(args);
+      return notification ? notification : null;
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async updateNotification(args) {
+    try {
+      const id = args.id
+      const updatedNotification = await this.Notification.findOneAndUpdate({ _id: id }, args, { new: true } );
+      return updatedNotification ? { id, updated: true } : { id, updated: false};
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async deleteNotification(id) {
+    try {
+      const deletedNotification = await this.Notification.deleteOne({ _id: id });
+      return deletedNotification.deletedCount > 0 ? { id, deleted: true } : { id, deleted: false };
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  //Reasons
+  async reason(id) {
+    try {
+      const reason = await this.Reason.findOne({ _id: id });
+      return reason ? reason : null;
+    } catch(e){
+      console.log('Oops Something went wrong with finding the reason');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async reasons(limit = 10, skip = 0, query = {}) {
+    try {
+      const count = await this.Reason.where(query).countDocuments();
+      if (skip >= count) {
+        skip = 0;
+      }
+      const records = await this.Reason.find(query).limit(limit).skip(skip);
+      return records.length > 0 ? { records, count } : { records : [], count: 0 };
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async createReason(args) {
+    try {
+      const reason = await this.Reason.create(args);
+      return reason ? reason : null;
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async updateReason(args) {
+    try {
+      const id = args.id
+      const updatedReason = await this.Reason.findOneAndUpdate({ _id: id }, args, { new: true } );
+      return updatedReason ? { id, updated: true } : { id, updated: false};
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async deleteReason(id) {
+    try {
+      const deletedReason = await this.Reason.deleteOne({ _id: id });
+      return deletedReason.deletedCount > 0 ? { id, deleted: true } : { id, deleted: false };
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
 }
 
 module.exports = mongoAPI;

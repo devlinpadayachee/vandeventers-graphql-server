@@ -8,24 +8,30 @@ const { applyMiddleware } = require ('graphql-middleware');
 const BaseTypeDef = require ('./schemas/base');
 const UserTypeDef = require ('./schemas/user');
 const PostTypeDef = require ('./schemas/post');
+const NotificationTypeDef = require ('./schemas/notification');
+const ReasonTypeDef = require ('./schemas/reason');
 const SmappeeTypeDef = require ('./schemas/smappee');
 const BaseResolver = require('./resolvers/base');
 const UserResolver = require('./resolvers/user');
 const PostResolver = require('./resolvers/post');
+const NotificationResolver = require('./resolvers/notification');
+const ReasonResolver = require('./resolvers/reason');
 const SmappeeResolver = require ('./resolvers/smappee');
 const permissions = require('./permissions');
 
 const { createMongoInstance, verifyToken } = require('./utils');
+
 const _ = require('lodash');
 const mongoAPI = require('./datasources/mongo');
 const smappeeAPI = require('./datasources/smappee');
+const notificationAPI = require('./datasources/notification');
 
 const mongoInstance = createMongoInstance();
 
 const schema = applyMiddleware(
     makeExecutableSchema({
-        typeDefs: [ BaseTypeDef, UserTypeDef, PostTypeDef, SmappeeTypeDef ],
-        resolvers: _.merge( BaseResolver, UserResolver, PostResolver, SmappeeResolver )
+        typeDefs: [ BaseTypeDef, UserTypeDef, PostTypeDef, NotificationTypeDef, ReasonTypeDef, SmappeeTypeDef ],
+        resolvers: _.merge( BaseResolver, UserResolver, PostResolver, NotificationResolver, ReasonResolver, SmappeeResolver )
     }),
     permissions
 );
@@ -44,7 +50,8 @@ const server = new ApolloServer({
     },
     dataSources: () => ({
         mongoAPI: new mongoAPI({ mongoInstance }),
-        smappeeAPI: new smappeeAPI({})
+        smappeeAPI: new smappeeAPI({}),
+        notificationAPI: new notificationAPI({})
     }),
 });
 

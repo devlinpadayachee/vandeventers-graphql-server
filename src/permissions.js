@@ -28,6 +28,10 @@ module.exports = shield({
         users: isAuthenticated,
         post: isAuthenticated,
         posts: isAuthenticated,
+        notification: isAuthenticated,
+        notifications: isAuthenticated,
+        reason: isAuthenticated,
+        reasons: isAuthenticated,
     },
     Mutation: { 
         login: not(isAuthenticated),
@@ -37,6 +41,12 @@ module.exports = shield({
         createPost: and(isAuthenticated, isAdmin),
         updatePost: and(isAuthenticated, isAdmin),
         deletePost: and(isAuthenticated, isAdmin),
+        createNotification: and(isAuthenticated, isAdmin),
+        updateNotification: and(isAuthenticated, isAdmin),
+        deleteNotification: and(isAuthenticated, isAdmin),
+        createReason: and(isAuthenticated, isAdmin),
+        updateReason: and(isAuthenticated, isAdmin),
+        deleteReason: and(isAuthenticated, isAdmin),
     },
 },{
     allowExternalErrors : true

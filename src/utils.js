@@ -48,6 +48,8 @@ module.exports.createMongoInstance = () => {
     password: {type: String, required: true},
     email: {type: String, required: true, index: true, unique: true},
     role: {type: String, required: true, enum: ['admin', 'user']},
+    pushToken: {type: String},
+    serviceLocations: {type: [String]},
     createdAt: Number,
     updatedAt: Number,
   },{
@@ -63,11 +65,35 @@ module.exports.createMongoInstance = () => {
   },{
     timestamps: { currentTime: () => Date.now() }
   });
+
+  const notificationSchema = new Schema({
+    title: {type: String, required: true},
+    content: {type: String, required: true},
+    user: {type: Schema.Types.ObjectId, required: true},
+    reason: {type: Schema.Types.ObjectId},
+    comment: {type: String},
+    createdBy: {type: Schema.Types.ObjectId, required: true},
+    createdAt: Number,
+    updatedAt: Number,
+  },{
+    timestamps: { currentTime: () => Date.now() }
+  });
+
+  const reasonSchema = new Schema({
+    explanation: {type: String, required: true},
+    createdBy: {type: Schema.Types.ObjectId, required: true},
+    createdAt: Number,
+    updatedAt: Number,
+  },{
+    timestamps: { currentTime: () => Date.now() }
+  });
   
   const User = mongoose.model('User', userSchema);
   const Post = mongoose.model('Post', postSchema);
+  const Notification = mongoose.model('Notification', notificationSchema);
+  const Reason = mongoose.model('Reason', reasonSchema);
  
-  return { User, Post };
+  return { User, Post, Notification, Reason };
 };
 
 module.exports.getPasswordHash = (password) => {

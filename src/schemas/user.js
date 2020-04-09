@@ -8,6 +8,7 @@ const typeDefs = gql`
         email: String!
         role: Role!
         pushToken: String
+        location: JSON
         serviceLocations: JSON
         createdAt: Float!
         updatedAt: Float!
@@ -46,6 +47,7 @@ const typeDefs = gql`
         email: String
         role: Role
         pushToken: String
+        location: JSON
         serviceLocations: JSON
     }
     

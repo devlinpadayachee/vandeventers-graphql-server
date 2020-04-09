@@ -49,6 +49,7 @@ module.exports.createMongoInstance = () => {
     email: {type: String, required: true, index: true, unique: true},
     role: {type: String, required: true, enum: ['admin', 'user']},
     pushToken: {type: String},
+    location: {type: Object},
     serviceLocations: {type: [String]},
     createdAt: Number,
     updatedAt: Number,

@@ -10,6 +10,7 @@ const typeDefs = gql`
         pushToken: String
         location: JSON
         serviceLocations: JSON
+        metaData: JSON
         createdAt: Float!
         updatedAt: Float!
     }
@@ -49,6 +50,7 @@ const typeDefs = gql`
         pushToken: String
         location: JSON
         serviceLocations: JSON
+        metaData: JSON
     }
     
     type LoginResponse {

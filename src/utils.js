@@ -51,6 +51,7 @@ module.exports.createMongoInstance = () => {
     pushToken: {type: String},
     location: {type: Object},
     serviceLocations: {type: [String]},
+    metaData: {type: Object},
     createdAt: Number,
     updatedAt: Number,
   },{

@@ -55,6 +55,6 @@ const server = new ApolloServer({
     }),
 });
 
-server.listen().then(({ url }) => {
+server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
     console.log(`Server ${JSON.stringify(process.env.APP_TITLE)} is ready at ${process.env.APP_HOST_URL}`);
 });

@@ -37,6 +37,8 @@ const schema = applyMiddleware(
 );
 
 const server = new ApolloServer({
+    introspection: true,
+    playground: true,
     schema,
     context: async ({ req }) => {
         let user = null

@@ -52,6 +52,10 @@ module.exports.createMongoInstance = () => {
     location: {type: Object},
     serviceLocations: {type: [String]},
     metaData: {type: Object},
+    profilePicture: {type: String},
+    homePicture: {type: String},
+    tempPassword: {type: String},
+    loginCounter: Number,
     createdAt: Number,
     updatedAt: Number,
   },{

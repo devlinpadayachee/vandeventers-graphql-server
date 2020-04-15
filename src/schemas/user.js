@@ -11,6 +11,10 @@ const typeDefs = gql`
         location: JSON
         serviceLocations: JSON
         metaData: JSON
+        profilePicture: String
+        homePicture: String
+        tempPassword: String
+        loginCounter: Number
         createdAt: Float!
         updatedAt: Float!
     }
@@ -51,6 +55,10 @@ const typeDefs = gql`
         location: JSON
         serviceLocations: JSON
         metaData: JSON
+        profilePicture: String
+        homePicture: String
+        tempPassword: String
+        loginCounter: Number
     }
     
     type LoginResponse {

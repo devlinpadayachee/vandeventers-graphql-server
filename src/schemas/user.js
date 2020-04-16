@@ -14,7 +14,7 @@ const typeDefs = gql`
         profilePicture: String
         homePicture: String
         tempPassword: String
-        loginCounter: Number
+        loginCounter: Int
         createdAt: Float!
         updatedAt: Float!
     }
@@ -58,7 +58,7 @@ const typeDefs = gql`
         profilePicture: String
         homePicture: String
         tempPassword: String
-        loginCounter: Number
+        loginCounter: Int
     }
     
     type LoginResponse {

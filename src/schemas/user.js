@@ -11,8 +11,8 @@ const typeDefs = gql`
         location: JSON
         serviceLocations: JSON
         metaData: JSON
-        profilePicture: String
-        homePicture: String
+        profilePicture: ID
+        homePicture: ID
         tempPassword: String
         loginCounter: Int
         createdAt: Float!
@@ -55,8 +55,8 @@ const typeDefs = gql`
         location: JSON
         serviceLocations: JSON
         metaData: JSON
-        profilePicture: String
-        homePicture: String
+        profilePicture: ID
+        homePicture: ID
         tempPassword: String
         loginCounter: Int
     }

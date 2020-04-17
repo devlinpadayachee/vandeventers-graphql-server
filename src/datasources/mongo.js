@@ -13,6 +13,7 @@ class mongoAPI extends DataSource {
     this.Post = mongoInstance.Post;
     this.Notification = mongoInstance.Notification;
     this.Reason = mongoInstance.Reason;
+    this.Attachment = mongoInstance.Attachment;
   }
   
   initialize(config) {
@@ -79,7 +80,7 @@ class mongoAPI extends DataSource {
   async findUserbyEmail(email) {
     try {
       console.log('findUserbyEmail', email)
-      const user = await this.User.findOne({email: email});
+      const user = await this.User.findOne({email: email},'');
       return user ? user : null;
     } catch(e){
       console.log('Oops Something went wrong with finding the user by email');
@@ -249,6 +250,63 @@ class mongoAPI extends DataSource {
     try {
       const deletedReason = await this.Reason.deleteOne({ _id: id });
       return deletedReason.deletedCount > 0 ? { id, deleted: true } : { id, deleted: false };
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  //Attachments
+
+  async attachment(id) {
+    try {
+      const attachment = await this.Attachment.findOne({ _id: id });
+      return attachment ? attachment : null;
+    } catch(e){
+      console.log('Oops Something went wrong with finding the attachment');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async attachments(limit = 10, skip = 0, query = {}) {
+    try {
+      const count = await this.Attachment.where(query).countDocuments();
+      if (skip >= count) {
+        skip = 0;
+      }
+      const records = await this.Attachment.find(query).limit(limit).skip(skip);
+      return records.length > 0 ? { records, count } : { records : [], count: 0 };
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async createAttachment(args) {
+    try {
+      const attachment = await this.Attachment.create(args);
+      return attachment ? attachment : null;
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async updateAttachment(args) {
+    try {
+      const id = args.id
+      const updatedAttachment = await this.Attachment.findOneAndUpdate({ _id: id }, args, { new: true } );
+      return updatedAttachment ? { id, updated: true } : { id, updated: false };
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async deleteAttachment(id) {
+    try {
+      const deletedAttachment = await this.Attachment.deleteOne({ _id: id });
+      return deletedAttachment.deletedCount > 0 ? { id, deleted: true } : { id, deleted: false };
     } catch(e){
       console.log('Oops Something went wrong');
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});

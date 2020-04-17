@@ -93,13 +93,24 @@ module.exports.createMongoInstance = () => {
   },{
     timestamps: { currentTime: () => Date.now() }
   });
+
+  const attachmentSchema = new Schema({
+    base64: {type: String, required: true},
+    type: {type: String, required: true, enum: ['image']},
+    createdBy: {type: Schema.Types.ObjectId, required: true},
+    createdAt: Number,
+    updatedAt: Number,
+  },{
+    timestamps: { currentTime: () => Date.now() }
+  });
   
   const User = mongoose.model('User', userSchema);
   const Post = mongoose.model('Post', postSchema);
   const Notification = mongoose.model('Notification', notificationSchema);
   const Reason = mongoose.model('Reason', reasonSchema);
+  const Attachment = mongoose.model('Attachment', attachmentSchema);
  
-  return { User, Post, Notification, Reason };
+  return { User, Post, Notification, Reason, Attachment };
 };
 
 module.exports.getPasswordHash = (password) => {

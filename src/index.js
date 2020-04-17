@@ -10,12 +10,14 @@ const UserTypeDef = require ('./schemas/user');
 const PostTypeDef = require ('./schemas/post');
 const NotificationTypeDef = require ('./schemas/notification');
 const ReasonTypeDef = require ('./schemas/reason');
+const AttachmentTypeDef = require ('./schemas/attachment');
 const SmappeeTypeDef = require ('./schemas/smappee');
 const BaseResolver = require('./resolvers/base');
 const UserResolver = require('./resolvers/user');
 const PostResolver = require('./resolvers/post');
 const NotificationResolver = require('./resolvers/notification');
 const ReasonResolver = require('./resolvers/reason');
+const AttachmentResolver = require('./resolvers/attachment');
 const SmappeeResolver = require ('./resolvers/smappee');
 const permissions = require('./permissions');
 
@@ -30,8 +32,8 @@ const mongoInstance = createMongoInstance();
 
 const schema = applyMiddleware(
     makeExecutableSchema({
-        typeDefs: [ BaseTypeDef, UserTypeDef, PostTypeDef, NotificationTypeDef, ReasonTypeDef, SmappeeTypeDef ],
-        resolvers: _.merge( BaseResolver, UserResolver, PostResolver, NotificationResolver, ReasonResolver, SmappeeResolver )
+        typeDefs: [ BaseTypeDef, UserTypeDef, PostTypeDef, NotificationTypeDef, ReasonTypeDef, AttachmentTypeDef, SmappeeTypeDef ],
+        resolvers: _.merge( BaseResolver, UserResolver, PostResolver, NotificationResolver, ReasonResolver, AttachmentResolver, SmappeeResolver )
     }),
     permissions
 );

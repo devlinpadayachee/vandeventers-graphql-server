@@ -10,6 +10,10 @@ const typeDefs = gql`
         user
     }
 
+    enum AttachmentType {
+        image
+    }
+
     type UpdatedResponse {
         id: ID!
         updated: Boolean!

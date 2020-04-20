@@ -36,7 +36,7 @@ module.exports.createMongoInstance = () => {
   mongoose.set('useFindAndModify', false);
   mongoose.set('useCreateIndex', true);
   mongoose.set('useUnifiedTopology', true);
-  mongoose.connect('mongodb+srv://admin:sepiroth6043@illyrian-graphql-server-uwzdp.gcp.mongodb.net/test?retryWrites=true&w=majority');
+  mongoose.connect('mongodb+srv://admin:sepiroth6043@cluster0-0c4kf.gcp.mongodb.net/test?retryWrites=true&w=majority');
   var db = mongoose.connection;
   db.on('error', console.error.bind(console, 'connection error:'));
   db.once('open', function() {

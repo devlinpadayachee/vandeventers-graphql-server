@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+const pdf = require('html-pdf');
+var Queue = require('bull');
+const Arena = require('bull-arena');
 
 module.exports.paginateResults = ({
   after: cursor,
@@ -128,3 +132,112 @@ module.exports.verifyToken = (token) => {
     }
   })
 };
+
+module.exports.createMailerQueueInstance = () => {
+  const mailerQueue = new Queue('mailer-queue', {redis: {port: process.env.APP_MAILER_QUEUE_REDIS_PORT || 6379, host: process.env.APP_MAILER_QUEUE_REDIS_URL}});
+  mailerQueue.process(async (job) => {
+    job.progress(0);
+    const {data: { to, subject, html, filename = undefined }} = job;
+    job.progress(20);
+    let attachments = [];
+    if (filename) {
+      job.progress(30);
+      const buffer = getPDFBuffer(html);
+      attachments = buffer ? [{filename, content: buffer}] : [];
+      job.progress(40);
+    }
+    try {
+      job.progress(50);
+      const mailResult = await sendMail(to, subject, html, attachments);
+      job.progress(100);
+      return mailResult
+    } catch(error) {
+      job.progress(75);
+      throw new Error(error);
+    }
+  });
+  mailerQueue.on('completed', (job, result) => {
+    console.log(`Mailer job completed with result ${result}`);
+  });
+  return { mailerQueue };
+};
+
+function getPDFBuffer (html) {
+  let options = { 
+    format: 'A4', 
+    orientation: 'portrait', 
+    type: 'pdf', 
+    timeout: '100000', 
+    width: "930px", 
+    height: "1316px"
+  }
+  pdf.create(html, options).toBuffer((error, buffer) => {
+    if (error) {
+      return undefined;
+    }
+    return buffer;
+  });
+}
+
+function sendMail (to, subject, html, attachments) {
+  return new Promise((resolve, reject) => {
+    console.log('Sending mail', { to, subject, html, attachments });
+    console.log({
+      host: process.env.APP_MAILER_SMTP,
+      port: parseInt(process.env.APP_MAILER_PORT),
+      secure: process.env.APP_MAILER_SECURE && process.env.APP_MAILER_SECURE === 'true' ? true : false,
+      auth: {
+        user: process.env.APP_MAILER_USERNAME,
+        pass: process.env.APP_MAILER_PASSWORD
+      }
+    });
+    let transporter = nodemailer.createTransport({
+      host: process.env.APP_MAILER_SMTP,
+      port: parseInt(process.env.APP_MAILER_PORT),
+      secure: process.env.APP_MAILER_SECURE && process.env.APP_MAILER_SECURE === 'true' ? true : false,
+      auth: {
+        user: process.env.APP_MAILER_USERNAME,
+        pass: process.env.APP_MAILER_PASSWORD
+      }
+    });
+    let mailOptions = {
+      from: process.env.APP_MAILER_FROM,
+      to,
+      subject,
+      html,
+      attachments
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+      if(error) {
+        return reject(`An error occurred while tring to send mail to ${to}: ${error.message}`);
+      }
+      return resolve(`Mail sent: ${JSON.stringify(info)}`);
+    });
+  })
+}
+
+module.exports.getArenaConfig = () => {
+  const arenaConfig = Arena({
+    queues: [
+      {
+        name: "mailer-queue",
+        hostId: "mailers",
+        redis: {
+          port: process.env.APP_MAILER_QUEUE_REDIS_PORT || 6379,
+          host: process.env.APP_MAILER_QUEUE_REDIS_URL,
+        },
+      },
+    ],
+  },
+  {
+    basePath: '/queues',
+    disableListen: true
+  });
+  return arenaConfig;
+};
+
+
+
+
+
+

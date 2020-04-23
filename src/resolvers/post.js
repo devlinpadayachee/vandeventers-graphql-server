@@ -2,7 +2,7 @@ const {
     AuthenticationError,
     UserInputError,
     ApolloError
-} = require('apollo-server');
+} = require('apollo-server-express');
 
 module.exports = {
     Query: {

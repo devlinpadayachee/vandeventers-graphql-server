@@ -2,7 +2,7 @@ const {
     AuthenticationError,
     UserInputError,
     ApolloError
-} = require('apollo-server');
+} = require('apollo-server-express');
 
 const { rule, shield, and, or, not } = require('graphql-shield');
 

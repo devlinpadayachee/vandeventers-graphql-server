@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server');
+const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
 
@@ -15,8 +15,7 @@ const typeDefs = gql`
         updatedAt: Float!
     }
 
-    type Query {
-        ping: String!
+    extend type Query {
         me: User
         user(id:ID!): User
         users(limit:Int!, skip:Int!, query: JSON!): UsersResponse!

@@ -2,19 +2,13 @@ const {
     AuthenticationError,
     UserInputError,
     ApolloError
-} = require('apollo-server');
-
+} = require('apollo-server-express');
 const bcrypt = require('bcrypt');
-
-
 const isEmail = require('isemail');
 const { paginateResults, getPasswordHash, getJWT } = require('../utils');
 
 module.exports = {
     Query: {
-        ping: (parent, args, context, info) => {
-            return "Im alive!"
-        },
         me: (parent, args, context, info) => {
             return context.user
         },

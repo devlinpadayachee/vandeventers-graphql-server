@@ -2,7 +2,7 @@ const {
   AuthenticationError,
   UserInputError,
   ApolloError
-} = require('apollo-server');
+} = require('apollo-server-express');
 const { DataSource } = require('apollo-datasource');
 const isEmail = require('isemail');
 
@@ -16,7 +16,6 @@ class mongoAPI extends DataSource {
   }
   
   initialize(config) {
-    
     this.context = config.context;
   }
 

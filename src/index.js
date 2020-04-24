@@ -64,7 +64,7 @@ const server = new ApolloServer({
         smappeeAPI: new smappeeAPI({}),
         notificationAPI: new notificationAPI({}),
         mailAPI: new mailAPI({ mailerQueueInstance })
-    }),
+    })
 });
 
 const app = express();

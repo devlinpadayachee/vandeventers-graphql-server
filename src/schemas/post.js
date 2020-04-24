@@ -18,8 +18,8 @@ const typeDefs = gql`
 
     extend type Mutation {
         createPost(post: PostCreateInput): Post!
-        updatePost(post: PostUpdateInput): UpdatedResponse! 
-        deletePost(id: ID!): DeletedResponse! 
+        updatePost(post: PostUpdateInput): PostUpdatedResponse! 
+        deletePost(id: ID!): PostDeletedResponse! 
     }
 
     type PostsResponse {
@@ -37,6 +37,18 @@ const typeDefs = gql`
         id: ID!
         title: String
         content: String
+    }
+
+    type PostUpdatedResponse {
+        id: ID!
+        updated: Boolean!
+        post: Post
+    }
+
+    type PostDeletedResponse {
+        id: ID!
+        deleted: Boolean!
+        post: Post
     }
 
     

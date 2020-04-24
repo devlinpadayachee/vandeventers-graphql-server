@@ -25,15 +25,10 @@ const typeDefs = gql`
     type Mutation {
         login(email: String!, password: String!): LoginResponse!
         getResetPasswordLink(email: String!): JSON!
-        resetPassword(resetToken: String!, password: String!): UpdatedResponse!
+        resetPassword(resetToken: String!, password: String!): UserUpdatedResponse!
         createUser(user: UserCreateInput): User!
-        updateUser(user: UserUpdateInput): UpdatedResponse! 
-        deleteUser(id: ID!): DeletedResponse! 
-    }
-
-    type UsersResponse {
-        records: [User]!
-        count: Int!
+        updateUser(user: UserUpdateInput): UserUpdatedResponse! 
+        deleteUser(id: ID!): UserDeletedResponse! 
     }
 
     input UserCreateInput {
@@ -55,7 +50,24 @@ const typeDefs = gql`
         metaData: JSON
         resetToken: String
     }
-    
+
+    type UsersResponse {
+        records: [User]!
+        count: Int!
+    }
+
+    type UserUpdatedResponse {
+        id: ID!
+        updated: Boolean!
+        user: User
+    }
+
+    type UserDeletedResponse {
+        id: ID!
+        deleted: Boolean!
+        user: User
+    }
+
     type LoginResponse {
         user: User
         token: String

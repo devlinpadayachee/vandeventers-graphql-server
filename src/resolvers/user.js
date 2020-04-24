@@ -47,15 +47,16 @@ module.exports = {
             throw new ApolloError('Could not generate password reset link mailer', 'ACTION_NOT_COMPLETED', {});
         },
         resetPassword: async (parent, args, context, info) => {
+            console.log('args', JSON.stringify(args));
             const user = await context.dataSources.mongoAPI.findUserbyResetToken(args.resetToken);
-            if (!user) throw new UserInputError('Could not find user!');
+            if (!user) throw new UserInputError('Could not validate this reset link. Please make sure that you have clicked on the most recent password reset link that was sent to you.');
             const password = await getPasswordHash(args.password);
             const updated = await context.dataSources.mongoAPI.updateUser({
                 id: user.id,
                 password,
                 resetToken: null
             });
-            if (updated) return updated
+            if (updated) return updated;
             throw new ApolloError('Could not reset user password', 'ACTION_NOT_COMPLETED', {});
         },
         createUser: async (parent, args, context, info) => {

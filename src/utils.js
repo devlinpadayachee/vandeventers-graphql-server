@@ -57,6 +57,7 @@ module.exports.createMongoInstance = async () => {
     location: {type: Object},
     serviceLocations: {type: [String]},
     metaData: {type: Object},
+    resetToken: {type: String},
     createdAt: Number,
     updatedAt: Number,
   },{

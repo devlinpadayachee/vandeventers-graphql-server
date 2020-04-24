@@ -14,17 +14,7 @@ const typeDefs = gql`
         admin
         user
     }
-
-    type UpdatedResponse {
-        id: ID!
-        updated: Boolean!
-    }
-
-    type DeletedResponse {
-        id: ID!
-        deleted: Boolean!
-    }
-
+    
     type AckResponse {
         success: Boolean!
     }

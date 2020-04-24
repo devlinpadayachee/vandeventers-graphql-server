@@ -58,7 +58,7 @@ class mongoAPI extends DataSource {
     try {
       const id = args.id
       const updatedUser = await this.User.findOneAndUpdate({ _id: id }, args, { new: true } );
-      return updatedUser ? { id, updated: true } : { id, updated: false };
+      return updatedUser ? { id, updated: true, user: updatedUser } : { id, updated: false, user: null };
     } catch(e){
       console.log('Oops Something went wrong');
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
@@ -68,7 +68,7 @@ class mongoAPI extends DataSource {
   async deleteUser(id) {
     try {
       const deletedUser = await this.User.deleteOne({ _id: id });
-      return deletedUser.deletedCount > 0 ? { id, deleted: true } : { id, deleted: false };
+      return deletedUser.deletedCount > 0 ? { id, deleted: true, user: deletedUser  } : { id, deleted: false, user: null };
     } catch(e){
       console.log('Oops Something went wrong');
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
@@ -136,7 +136,7 @@ class mongoAPI extends DataSource {
     try {
       const id = args.id
       const updatedPost = await this.Post.findOneAndUpdate({ _id: id }, args, { new: true } );
-      return updatedPost ? { id, updated: true } : { id, updated: false };
+      return updatedPost ? { id, updated: true, post: updatedPost } : { id, updated: false, post: null };
     } catch(e){
       console.log('Oops Something went wrong');
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
@@ -146,7 +146,7 @@ class mongoAPI extends DataSource {
   async deletePost(id) {
     try {
       const deletedPost = await this.Post.deleteOne({ _id: id });
-      return deletedPost.deletedCount > 0 ? { id, deleted: true } : { id, deleted: false };
+      return deletedPost.deletedCount > 0 ? { id, deleted: true, post: deletedPost } : { id, deleted: false, post: null };
     } catch(e){
       console.log('Oops Something went wrong');
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
@@ -192,7 +192,7 @@ class mongoAPI extends DataSource {
     try {
       const id = args.id
       const updatedNotification = await this.Notification.findOneAndUpdate({ _id: id }, args, { new: true } );
-      return updatedNotification ? { id, updated: true } : { id, updated: false};
+      return updatedNotification ? { id, updated: true, notification: updatedNotification } : { id, updated: false, notification: null};
     } catch(e){
       console.log('Oops Something went wrong');
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
@@ -202,7 +202,7 @@ class mongoAPI extends DataSource {
   async deleteNotification(id) {
     try {
       const deletedNotification = await this.Notification.deleteOne({ _id: id });
-      return deletedNotification.deletedCount > 0 ? { id, deleted: true } : { id, deleted: false };
+      return deletedNotification.deletedCount > 0 ? { id, deleted: true, notification: deletedNotification } : { id, deleted: false, notification: null };
     } catch(e){
       console.log('Oops Something went wrong');
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
@@ -248,7 +248,7 @@ class mongoAPI extends DataSource {
     try {
       const id = args.id
       const updatedReason = await this.Reason.findOneAndUpdate({ _id: id }, args, { new: true } );
-      return updatedReason ? { id, updated: true } : { id, updated: false};
+      return updatedReason ? { id, updated: true, reason: updatedReason } : { id, updated: false, reason: null };
     } catch(e){
       console.log('Oops Something went wrong');
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
@@ -258,7 +258,7 @@ class mongoAPI extends DataSource {
   async deleteReason(id) {
     try {
       const deletedReason = await this.Reason.deleteOne({ _id: id });
-      return deletedReason.deletedCount > 0 ? { id, deleted: true } : { id, deleted: false };
+      return deletedReason.deletedCount > 0 ? { id, deleted: true, reason: deletedReason } : { id, deleted: false, reason: null };
     } catch(e){
       console.log('Oops Something went wrong');
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});

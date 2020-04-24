@@ -75,6 +75,17 @@ class mongoAPI extends DataSource {
     }
   }
 
+  async findUserbyResetToken(resetToken) {
+    try {
+      console.log('findUserbyResetToken', resetToken)
+      const user = await this.User.findOne({resetToken: resetToken});
+      return user ? user : null;
+    } catch(e){
+      console.log('Oops Something went wrong with finding the user by reset token');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
   async findUserbyEmail(email) {
     try {
       console.log('findUserbyEmail', email)

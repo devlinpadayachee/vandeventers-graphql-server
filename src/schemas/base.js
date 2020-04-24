@@ -24,6 +24,10 @@ const typeDefs = gql`
         id: ID!
         deleted: Boolean!
     }
+
+    type AckResponse {
+        success: Boolean!
+    }
         
 `;
 

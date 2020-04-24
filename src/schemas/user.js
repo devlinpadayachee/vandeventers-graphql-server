@@ -11,6 +11,7 @@ const typeDefs = gql`
         location: JSON
         serviceLocations: JSON
         metaData: JSON
+        resetToken: String
         createdAt: Float!
         updatedAt: Float!
     }
@@ -23,6 +24,8 @@ const typeDefs = gql`
 
     type Mutation {
         login(email: String!, password: String!): LoginResponse!
+        getResetPasswordLink(email: String!): JSON!
+        resetPassword(resetToken: String!, password: String!): UpdatedResponse!
         createUser(user: UserCreateInput): User!
         updateUser(user: UserUpdateInput): UpdatedResponse! 
         deleteUser(id: ID!): DeletedResponse! 
@@ -50,6 +53,7 @@ const typeDefs = gql`
         location: JSON
         serviceLocations: JSON
         metaData: JSON
+        resetToken: String
     }
     
     type LoginResponse {

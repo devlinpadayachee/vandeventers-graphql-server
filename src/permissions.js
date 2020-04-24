@@ -23,6 +23,7 @@ const isAdmin = rule({ cache: 'contextual' })(
 module.exports = shield({
     Query: {
         ping: not(isAuthenticated),
+        mailTest: and(isAuthenticated, isAdmin),
         me: isAuthenticated,
         user: isAuthenticated,
         users: isAuthenticated,
@@ -35,6 +36,8 @@ module.exports = shield({
     },
     Mutation: { 
         login: not(isAuthenticated),
+        getResetPasswordLink: not(isAuthenticated),
+        resetPassword: not(isAuthenticated),
         createUser: and(isAuthenticated, isAdmin),
         updateUser: and(isAuthenticated, isAdmin),
         deleteUser: and(isAuthenticated, isAdmin),

@@ -28,8 +28,13 @@ const smappeeAPI = require('./datasources/smappee');
 const notificationAPI = require('./datasources/notification');
 const mailAPI = require('./datasources/mail');
 
-const mongoInstance = createMongoInstance();
-const mailerQueueInstance = createMailerQueueInstance();
+var mongoInstance;
+var mailerQueueInstance;
+(async() => {
+    mongoInstance = await createMongoInstance();
+    mailerQueueInstance = await createMailerQueueInstance();
+})();
+
 
 
 const schema = applyMiddleware(

@@ -6,6 +6,7 @@ const nodemailer = require('nodemailer');
 const pdf = require('html-pdf');
 var Queue = require('bull');
 const Arena = require('bull-arena');
+const isEmail = require('isemail');
 
 module.exports.paginateResults = ({
   after: cursor,
@@ -35,7 +36,7 @@ module.exports.paginateResults = ({
     : results.slice(0, pageSize);
 };
 
-module.exports.createMongoInstance = () => {
+module.exports.createMongoInstance = async () => {
   mongoose.set('useNewUrlParser', true);
   mongoose.set('useFindAndModify', false);
   mongoose.set('useCreateIndex', true);
@@ -98,7 +99,26 @@ module.exports.createMongoInstance = () => {
   const Post = mongoose.model('Post', postSchema);
   const Notification = mongoose.model('Notification', notificationSchema);
   const Reason = mongoose.model('Reason', reasonSchema);
- 
+  const APP_DEFAULT_ADMIN_EMAIL = process.env.APP_DEFAULT_ADMIN_EMAIL || 'devlinpadayachee@gmail.com';
+  const APP_DEFAULT_ADMIN_PASSWORD= process.env.APP_DEFAULT_ADMIN_PASSWORD || 'Sepiroth6043@';
+  const defaultAdminUser = await User.findOne({email: APP_DEFAULT_ADMIN_EMAIL});
+  if (!defaultAdminUser && isEmail.validate(APP_DEFAULT_ADMIN_EMAIL)) {
+    console.log('Default admin user does not exist, creating one now');
+    const password = await this.getPasswordHash(APP_DEFAULT_ADMIN_PASSWORD);
+    const adminUser = await User.create({
+      username: 'admin',
+      password,
+      email: APP_DEFAULT_ADMIN_EMAIL,
+      role: 'admin'
+    });
+    if (adminUser) {
+      console.log('Admin user created:', APP_DEFAULT_ADMIN_EMAIL)
+    } else {
+      console.log('An error occured when trying to create the default admin user');
+    }
+  } else {
+    console.log('Skipped admin creation')
+  }
   return { User, Post, Notification, Reason };
 };
 
@@ -133,33 +153,37 @@ module.exports.verifyToken = (token) => {
   })
 };
 
-module.exports.createMailerQueueInstance = () => {
-  const mailerQueue = new Queue('mailer-queue', {redis: {port: process.env.APP_MAILER_QUEUE_REDIS_PORT || 6379, host: process.env.APP_MAILER_QUEUE_REDIS_URL}});
-  mailerQueue.process(async (job) => {
-    job.progress(0);
-    const {data: { to, subject, html, filename = undefined }} = job;
-    job.progress(20);
-    let attachments = [];
-    if (filename) {
-      job.progress(30);
-      const buffer = getPDFBuffer(html);
-      attachments = buffer ? [{filename, content: buffer}] : [];
-      job.progress(40);
-    }
-    try {
-      job.progress(50);
-      const mailResult = await sendMail(to, subject, html, attachments);
-      job.progress(100);
-      return mailResult
-    } catch(error) {
-      job.progress(75);
-      throw new Error(error);
-    }
-  });
-  mailerQueue.on('completed', (job, result) => {
-    console.log(`Mailer job completed with result ${result}`);
-  });
-  return { mailerQueue };
+module.exports.createMailerQueueInstance = async () => {
+  try {
+    const mailerQueue = new Queue('mailer-queue', {redis: {port: parseInt(process.env.APP_MAILER_QUEUE_REDIS_PORT) || 6379, host: process.env.APP_MAILER_QUEUE_REDIS_URL || '127.0.0.1'}});
+    mailerQueue.process(async (job) => {
+      job.progress(0);
+      const {data: { to, subject, html, filename = undefined }} = job;
+      job.progress(20);
+      let attachments = [];
+      if (filename) {
+        job.progress(30);
+        const buffer = getPDFBuffer(html);
+        attachments = buffer ? [{filename, content: buffer}] : [];
+        job.progress(40);
+      }
+      try {
+        job.progress(50);
+        const mailResult = await sendMail(to, subject, html, attachments);
+        job.progress(100);
+        return mailResult
+      } catch(error) {
+        job.progress(75);
+        throw new Error(error);
+      }
+    });
+    mailerQueue.on('completed', (job, result) => {
+      console.log(`Mailer job completed with result ${result}`);
+    });
+    return { mailerQueue };
+  } catch(error) {
+    console.log(`Failed to connect to Redis mailer queue on ${process.env.APP_MAILER_QUEUE_REDIS_URL || '127.0.0.1'}`)
+  }
 };
 
 function getPDFBuffer (html) {
@@ -223,7 +247,7 @@ module.exports.getArenaConfig = () => {
         name: "mailer-queue",
         hostId: "mailers",
         redis: {
-          port: process.env.APP_MAILER_QUEUE_REDIS_PORT || 6379,
+          port: parseInt(process.env.APP_MAILER_QUEUE_REDIS_PORT) || 6379,
           host: process.env.APP_MAILER_QUEUE_REDIS_URL,
         },
       },

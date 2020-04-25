@@ -171,7 +171,11 @@ module.exports.verifyToken = (token) => {
 
 module.exports.createMailerQueueInstance = async () => {
   try {
-    const mailerQueue = new Queue('mailer-queue', {redis: {port: parseInt(process.env.APP_MAILER_QUEUE_REDIS_PORT) || 6379, host: process.env.APP_MAILER_QUEUE_REDIS_URL || '127.0.0.1'}});
+    if (process.env.NODE_ENV === 'production' && process.env.REDIS_URL){
+      const mailerQueue = new Queue('mailer-queue', process.env.REDIS_URL);
+    } else {
+      const mailerQueue = new Queue('mailer-queue', {redis: {port: parseInt(process.env.APP_MAILER_QUEUE_REDIS_PORT) || 6379, host: process.env.APP_MAILER_QUEUE_REDIS_URL || '127.0.0.1'}});
+    }
     mailerQueue.process(async (job) => {
       job.progress(0);
       const {data: { to, subject, html, filename = undefined }} = job;

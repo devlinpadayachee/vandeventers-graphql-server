@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server');
+const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
 
@@ -21,8 +21,8 @@ const typeDefs = gql`
 
     extend type Mutation {
         createNotification(notification: NotificationCreateInput): Notification!
-        updateNotification(notification: NotificationUpdateInput): UpdatedResponse! 
-        deleteNotification(id: ID!): DeletedResponse! 
+        updateNotification(notification: NotificationUpdateInput): NotificationUpdatedResponse! 
+        deleteNotification(id: ID!): NotificationDeletedResponse! 
     }
 
     type NotificationsResponse {
@@ -43,6 +43,18 @@ const typeDefs = gql`
         content: String
         reason: ID
         comment: String
+    }
+
+    type NotificationUpdatedResponse {
+        id: ID!
+        updated: Boolean!
+        notification: Notification
+    }
+
+    type NotificationDeletedResponse {
+        id: ID!
+        deleted: Boolean!
+        notification: Notification
     }
 
     

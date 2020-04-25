@@ -171,10 +171,11 @@ module.exports.verifyToken = (token) => {
 
 module.exports.createMailerQueueInstance = async () => {
   try {
+    var mailerQueue;
     if (process.env.NODE_ENV === 'production' && process.env.REDIS_URL){
-      const mailerQueue = new Queue('mailer-queue', process.env.REDIS_URL);
+      mailerQueue = new Queue('mailer-queue', process.env.REDIS_URL);
     } else {
-      const mailerQueue = new Queue('mailer-queue', {redis: {port: parseInt(process.env.APP_MAILER_QUEUE_REDIS_PORT) || 6379, host: process.env.APP_MAILER_QUEUE_REDIS_URL || '127.0.0.1'}});
+      mailerQueue = new Queue('mailer-queue', {redis: {port: parseInt(process.env.APP_MAILER_QUEUE_REDIS_PORT) || 6379, host: process.env.APP_MAILER_QUEUE_REDIS_URL || '127.0.0.1'}});
     }
     mailerQueue.process(async (job) => {
       job.progress(0);
@@ -202,7 +203,12 @@ module.exports.createMailerQueueInstance = async () => {
     });
     return { mailerQueue };
   } catch(error) {
-    console.log(`Failed to connect to Redis mailer queue on ${process.env.APP_MAILER_QUEUE_REDIS_URL || '127.0.0.1'}`)
+    if (process.env.NODE_ENV === 'production' && process.env.REDIS_URL){
+      console.log(`Failed to connect to Redis mailer queue on ${process.env.REDIS_URL}`);
+    }
+    else {
+      console.log(`Failed to connect to Redis mailer queue on ${process.env.APP_MAILER_QUEUE_REDIS_URL || '127.0.0.1'}`);
+    }
   }
 };
 

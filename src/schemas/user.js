@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server');
+const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
 
@@ -13,14 +13,13 @@ const typeDefs = gql`
         metaData: JSON
         profilePicture: ID
         homePicture: ID
-        tempPassword: String
         loginCounter: Int
+        resetToken: String
         createdAt: Float!
         updatedAt: Float!
     }
 
-    type Query {
-        ping: String!
+    extend type Query {
         me: User
         user(id:ID!): User
         users(limit:Int!, skip:Int!, query: JSON!): UsersResponse!
@@ -28,14 +27,11 @@ const typeDefs = gql`
 
     type Mutation {
         login(email: String!, password: String!): LoginResponse!
+        getResetPasswordLink(email: String!): JSON!
+        resetPassword(resetToken: String!, password: String!): UserUpdatedResponse!
         createUser(user: UserCreateInput): User!
-        updateUser(user: UserUpdateInput): UpdatedResponse! 
-        deleteUser(id: ID!): DeletedResponse! 
-    }
-
-    type UsersResponse {
-        records: [User]!
-        count: Int!
+        updateUser(user: UserUpdateInput): UserUpdatedResponse! 
+        deleteUser(id: ID!): UserDeletedResponse! 
     }
 
     input UserCreateInput {
@@ -57,10 +53,27 @@ const typeDefs = gql`
         metaData: JSON
         profilePicture: ID
         homePicture: ID
-        tempPassword: String
         loginCounter: Int
+        resetToken: String
     }
-    
+
+    type UsersResponse {
+        records: [User]!
+        count: Int!
+    }
+
+    type UserUpdatedResponse {
+        id: ID!
+        updated: Boolean!
+        user: User
+    }
+
+    type UserDeletedResponse {
+        id: ID!
+        deleted: Boolean!
+        user: User
+    }
+
     type LoginResponse {
         user: User
         token: String

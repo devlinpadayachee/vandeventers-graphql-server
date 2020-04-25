@@ -1,7 +1,12 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+const pdf = require('html-pdf');
+var Queue = require('bull');
+const Arena = require('bull-arena');
+const isEmail = require('isemail');
 
 module.exports.paginateResults = ({
   after: cursor,
@@ -31,7 +36,7 @@ module.exports.paginateResults = ({
     : results.slice(0, pageSize);
 };
 
-module.exports.createMongoInstance = () => {
+module.exports.createMongoInstance = async () => {
   mongoose.set('useNewUrlParser', true);
   mongoose.set('useFindAndModify', false);
   mongoose.set('useCreateIndex', true);
@@ -54,8 +59,8 @@ module.exports.createMongoInstance = () => {
     metaData: {type: Object},
     profilePicture: {type: String},
     homePicture: {type: String},
-    tempPassword: {type: String},
     loginCounter: Number,
+    resetToken: {type: String},
     createdAt: Number,
     updatedAt: Number,
   },{
@@ -110,6 +115,26 @@ module.exports.createMongoInstance = () => {
   const Reason = mongoose.model('Reason', reasonSchema);
   const Attachment = mongoose.model('Attachment', attachmentSchema);
  
+  const APP_DEFAULT_ADMIN_EMAIL = process.env.APP_DEFAULT_ADMIN_EMAIL || 'devlinpadayachee@gmail.com';
+  const APP_DEFAULT_ADMIN_PASSWORD= process.env.APP_DEFAULT_ADMIN_PASSWORD || 'Sepiroth6043@';
+  const defaultAdminUser = await User.findOne({email: APP_DEFAULT_ADMIN_EMAIL});
+  if (!defaultAdminUser && isEmail.validate(APP_DEFAULT_ADMIN_EMAIL)) {
+    console.log('Default admin user does not exist, creating one now');
+    const password = await this.getPasswordHash(APP_DEFAULT_ADMIN_PASSWORD);
+    const adminUser = await User.create({
+      username: 'admin',
+      password,
+      email: APP_DEFAULT_ADMIN_EMAIL,
+      role: 'admin'
+    });
+    if (adminUser) {
+      console.log('Admin user created:', APP_DEFAULT_ADMIN_EMAIL)
+    } else {
+      console.log('An error occured when trying to create the default admin user');
+    }
+  } else {
+    console.log('Skipped admin creation')
+  }
   return { User, Post, Notification, Reason, Attachment };
 };
 
@@ -143,3 +168,116 @@ module.exports.verifyToken = (token) => {
     }
   })
 };
+
+module.exports.createMailerQueueInstance = async () => {
+  try {
+    const mailerQueue = new Queue('mailer-queue', {redis: {port: parseInt(process.env.APP_MAILER_QUEUE_REDIS_PORT) || 6379, host: process.env.APP_MAILER_QUEUE_REDIS_URL || '127.0.0.1'}});
+    mailerQueue.process(async (job) => {
+      job.progress(0);
+      const {data: { to, subject, html, filename = undefined }} = job;
+      job.progress(20);
+      let attachments = [];
+      if (filename) {
+        job.progress(30);
+        const buffer = getPDFBuffer(html);
+        attachments = buffer ? [{filename, content: buffer}] : [];
+        job.progress(40);
+      }
+      try {
+        job.progress(50);
+        const mailResult = await sendMail(to, subject, html, attachments);
+        job.progress(100);
+        return mailResult
+      } catch(error) {
+        job.progress(75);
+        throw new Error(error);
+      }
+    });
+    mailerQueue.on('completed', (job, result) => {
+      console.log(`Mailer job completed with result ${result}`);
+    });
+    return { mailerQueue };
+  } catch(error) {
+    console.log(`Failed to connect to Redis mailer queue on ${process.env.APP_MAILER_QUEUE_REDIS_URL || '127.0.0.1'}`)
+  }
+};
+
+function getPDFBuffer (html) {
+  let options = { 
+    format: 'A4', 
+    orientation: 'portrait', 
+    type: 'pdf', 
+    timeout: '100000', 
+    width: "930px", 
+    height: "1316px"
+  }
+  pdf.create(html, options).toBuffer((error, buffer) => {
+    if (error) {
+      return undefined;
+    }
+    return buffer;
+  });
+}
+
+function sendMail (to, subject, html, attachments) {
+  return new Promise((resolve, reject) => {
+    console.log('Sending mail', { to, subject, html, attachments });
+    console.log({
+      host: process.env.APP_MAILER_SMTP,
+      port: parseInt(process.env.APP_MAILER_PORT),
+      secure: process.env.APP_MAILER_SECURE && process.env.APP_MAILER_SECURE === 'true' ? true : false,
+      auth: {
+        user: process.env.APP_MAILER_USERNAME,
+        pass: process.env.APP_MAILER_PASSWORD
+      }
+    });
+    let transporter = nodemailer.createTransport({
+      host: process.env.APP_MAILER_SMTP,
+      port: parseInt(process.env.APP_MAILER_PORT),
+      secure: process.env.APP_MAILER_SECURE && process.env.APP_MAILER_SECURE === 'true' ? true : false,
+      auth: {
+        user: process.env.APP_MAILER_USERNAME,
+        pass: process.env.APP_MAILER_PASSWORD
+      }
+    });
+    let mailOptions = {
+      from: process.env.APP_MAILER_FROM,
+      to,
+      subject,
+      html,
+      attachments
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+      if(error) {
+        return reject(`An error occurred while tring to send mail to ${to}: ${error.message}`);
+      }
+      return resolve(`Mail sent: ${JSON.stringify(info)}`);
+    });
+  })
+}
+
+module.exports.getArenaConfig = () => {
+  const arenaConfig = Arena({
+    queues: [
+      {
+        name: "mailer-queue",
+        hostId: "mailers",
+        redis: {
+          port: parseInt(process.env.APP_MAILER_QUEUE_REDIS_PORT) || 6379,
+          host: process.env.APP_MAILER_QUEUE_REDIS_URL,
+        },
+      },
+    ],
+  },
+  {
+    basePath: '/queues',
+    disableListen: true
+  });
+  return arenaConfig;
+};
+
+
+
+
+
+

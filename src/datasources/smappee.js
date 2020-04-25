@@ -2,7 +2,7 @@ const {
   AuthenticationError,
   UserInputError,
   ApolloError
-} = require('apollo-server');
+} = require('apollo-server-express');
 const { DataSource } = require('apollo-datasource');
 const isEmail = require('isemail');
 const axios = require('axios');

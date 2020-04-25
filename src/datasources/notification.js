@@ -2,7 +2,7 @@ const {
   AuthenticationError,
   UserInputError,
   ApolloError
-} = require('apollo-server');
+} = require('apollo-server-express');
 const { DataSource } = require('apollo-datasource');
 const { Expo } = require('expo-server-sdk');
 class notificationAPI extends DataSource {

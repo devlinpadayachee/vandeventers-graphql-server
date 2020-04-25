@@ -3,7 +3,8 @@ const {
     ApolloServer,
     makeExecutableSchema,
     AuthenticationError
-} = require('apollo-server');
+} = require('apollo-server-express');
+const express = require('express');
 const { applyMiddleware } = require ('graphql-middleware');
 const BaseTypeDef = require ('./schemas/base');
 const UserTypeDef = require ('./schemas/user');
@@ -21,14 +22,22 @@ const AttachmentResolver = require('./resolvers/attachment');
 const SmappeeResolver = require ('./resolvers/smappee');
 const permissions = require('./permissions');
 
-const { createMongoInstance, verifyToken } = require('./utils');
+const { createMongoInstance, createMailerQueueInstance, getArenaConfig, verifyToken } = require('./utils');
 
 const _ = require('lodash');
 const mongoAPI = require('./datasources/mongo');
 const smappeeAPI = require('./datasources/smappee');
 const notificationAPI = require('./datasources/notification');
+const mailAPI = require('./datasources/mail');
 
-const mongoInstance = createMongoInstance();
+var mongoInstance;
+var mailerQueueInstance;
+(async() => {
+    mongoInstance = await createMongoInstance();
+    mailerQueueInstance = await createMailerQueueInstance();
+})();
+
+
 
 const schema = applyMiddleware(
     makeExecutableSchema({
@@ -55,10 +64,15 @@ const server = new ApolloServer({
     dataSources: () => ({
         mongoAPI: new mongoAPI({ mongoInstance }),
         smappeeAPI: new smappeeAPI({}),
-        notificationAPI: new notificationAPI({})
-    }),
+        notificationAPI: new notificationAPI({}),
+        mailAPI: new mailAPI({ mailerQueueInstance })
+    })
 });
 
-server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
-    console.log(`Server ${JSON.stringify(process.env.APP_TITLE)} is ready at ${process.env.APP_HOST_URL}`);
-});
+const app = express();
+app.use('/', getArenaConfig());
+server.applyMiddleware({ app });
+
+app.listen({ port: process.env.PORT || 4000 }, () =>
+  console.log(`Server ready at http://localhost:4000${server.graphqlPath}`)
+);

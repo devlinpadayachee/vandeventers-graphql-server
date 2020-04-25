@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server');
+const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
 
@@ -18,15 +18,10 @@ const typeDefs = gql`
 
     extend type Mutation {
         createAttachment(attachment: AttachmentCreateInput): Attachment!
-        updateAttachment(attachment: AttachmentUpdateInput): UpdatedResponse! 
-        deleteAttachment(id: ID!): DeletedResponse! 
+        updateAttachment(attachment: AttachmentUpdateInput): AttachmentUpdatedResponse! 
+        deleteAttachment(id: ID!): AttachmentDeletedResponse! 
     }
-
-    type AttachmentsResponse {
-        records: [Attachment]!
-        count: Int!
-    }
-    
+   
     input AttachmentCreateInput {
         base64: String!
         type: AttachmentType!
@@ -39,7 +34,22 @@ const typeDefs = gql`
         type: AttachmentType
     }
 
-    
+    type AttachmentsResponse {
+        records: [Attachment]!
+        count: Int!
+    }
+
+    type AttachmentUpdatedResponse {
+        id: ID!
+        updated: Boolean!
+        attachment: Attachment
+    }
+
+    type AttachmentDeletedResponse {
+        id: ID!
+        deleted: Boolean!
+        attachment: Attachment
+    }
 `;
 
 module.exports = typeDefs;

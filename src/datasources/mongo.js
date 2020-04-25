@@ -306,7 +306,7 @@ class mongoAPI extends DataSource {
     try {
       const id = args.id
       const updatedAttachment = await this.Attachment.findOneAndUpdate({ _id: id }, args, { new: true } );
-      return updatedAttachment ? { id, updated: true } : { id, updated: false };
+      return updatedAttachment ? { id, updated: true, attachment: updatedAttachment  } : { id, updated: false, attachment: null  };
     } catch(e){
       console.log('Oops Something went wrong');
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
@@ -316,7 +316,7 @@ class mongoAPI extends DataSource {
   async deleteAttachment(id) {
     try {
       const deletedAttachment = await this.Attachment.deleteOne({ _id: id });
-      return deletedAttachment.deletedCount > 0 ? { id, deleted: true } : { id, deleted: false };
+      return deletedAttachment.deletedCount > 0 ? { id, deleted: true, attachment: deletedAttachment } : { id, deleted: false, attachment: null };
     } catch(e){
       console.log('Oops Something went wrong');
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});

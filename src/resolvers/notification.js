@@ -20,14 +20,17 @@ module.exports = {
         createNotification: async (parent, args, context, info) => {
             var user = await context.dataSources.mongoAPI.user(args.notification.user);
             var pushToken = user.pushToken;
+            const notification = await context.dataSources.mongoAPI.createNotification(args.notification);
             var ticket = await context.dataSources.notificationAPI.sendMessages([{
                 to: pushToken, 
                 sound: 'default',
                 title: args.notification.title,
                 body: args.notification.content,
+                data: {
+                    notification
+                },
                 priority: 'high'
             }]);
-            const notification = await context.dataSources.mongoAPI.createNotification(args.notification);
             if (notification) return notification;
             throw new ApolloError('Could not create notification', 'ACTION_NOT_COMPLETED', {});
         },

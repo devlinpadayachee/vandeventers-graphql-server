@@ -5,6 +5,7 @@ const {
     AuthenticationError
 } = require('apollo-server-express');
 const express = require('express');
+const bodyParser = require ('body-parser');
 const { applyMiddleware } = require ('graphql-middleware');
 const BaseTypeDef = require ('./schemas/base');
 const UserTypeDef = require ('./schemas/user');
@@ -70,6 +71,7 @@ const server = new ApolloServer({
 });
 
 const app = express();
+app.use(bodyParser.json({ limit: '200mb' }));
 app.use('/', getArenaConfig());
 server.applyMiddleware({ app });
 

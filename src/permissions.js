@@ -38,7 +38,7 @@ module.exports = shield({
         login: not(isAuthenticated),
         getResetPasswordLink: not(isAuthenticated),
         resetPassword: not(isAuthenticated),
-        createUser: and(isAuthenticated, isAdmin),
+        createUser: not(isAuthenticated),
         updateUser: and(isAuthenticated, isAdmin),
         deleteUser: and(isAuthenticated, isAdmin),
         createPost: and(isAuthenticated, isAdmin),

@@ -18,6 +18,11 @@ module.exports = {
             return job
         },
     },
+    Mutation: {
+        changeConfig: (parent, args, context, info) => {
+            return 'OK'
+        },
+    },
     JSON: GraphQLJSON,
     JSONObject: GraphQLJSONObject,
 };

@@ -3,7 +3,7 @@ const {
     UserInputError,
     ApolloError
 } = require('apollo-server-express');
-
+const { getHTMLBill } = require('../utils');
 module.exports = {
     Query: {
         token: async (parent, args, context, info) => {
@@ -27,4 +27,15 @@ module.exports = {
             return serviceLocations;
         },
     },
+    Mutation: {
+        sendBill: async (parent, args, context, info) => {
+            const user = await context.dataSources.mongoAPI.findUserbyEmail(args.email);
+            if (!user) throw new AuthenticationError('Could not find user!');
+            const serviceLocationCostAnalysis = await context.dataSources.smappeeAPI.serviceLocationCostAnalysis(args.serviceLocationId, args.aggregation, args.from, args.to );
+            const populatedTemplate = await getHTMLBill(user, serviceLocationCostAnalysis);
+            var job = context.dataSources.mailAPI.sendMail(args.email, 'Nuhome Monthly Bill', populatedTemplate);
+            if (job) return job;
+            throw new ApolloError('Could not generate password reset link mailer', 'ACTION_NOT_COMPLETED', {})
+        },
+    }
 };

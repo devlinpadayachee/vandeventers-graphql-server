@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server');
+const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
 
@@ -17,13 +17,8 @@ const typeDefs = gql`
 
     extend type Mutation {
         createReason(reason: ReasonCreateInput): Reason!
-        updateReason(reason: ReasonUpdateInput): UpdatedResponse! 
-        deleteReason(id: ID!): DeletedResponse! 
-    }
-
-    type ReasonsResponse {
-        records: [Reason]!
-        count: Int!
+        updateReason(reason: ReasonUpdateInput): ReasonUpdatedResponse! 
+        deleteReason(id: ID!): ReasonDeletedResponse! 
     }
     
     input ReasonCreateInput {
@@ -34,6 +29,23 @@ const typeDefs = gql`
     input ReasonUpdateInput {
         id: ID!
         explanation: String!
+    }
+
+    type ReasonsResponse {
+        records: [Reason]!
+        count: Int!
+    }
+
+    type ReasonUpdatedResponse {
+        id: ID!
+        updated: Boolean!
+        reason: Reason
+    }
+
+    type ReasonDeletedResponse {
+        id: ID!
+        deleted: Boolean!
+        reason: Reason
     }
 `;
 

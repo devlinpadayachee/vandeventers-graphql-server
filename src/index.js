@@ -3,35 +3,47 @@ const {
     ApolloServer,
     makeExecutableSchema,
     AuthenticationError
-} = require('apollo-server');
+} = require('apollo-server-express');
+const express = require('express');
+const bodyParser = require ('body-parser');
 const { applyMiddleware } = require ('graphql-middleware');
 const BaseTypeDef = require ('./schemas/base');
 const UserTypeDef = require ('./schemas/user');
 const PostTypeDef = require ('./schemas/post');
 const NotificationTypeDef = require ('./schemas/notification');
 const ReasonTypeDef = require ('./schemas/reason');
+const AttachmentTypeDef = require ('./schemas/attachment');
 const SmappeeTypeDef = require ('./schemas/smappee');
 const BaseResolver = require('./resolvers/base');
 const UserResolver = require('./resolvers/user');
 const PostResolver = require('./resolvers/post');
 const NotificationResolver = require('./resolvers/notification');
 const ReasonResolver = require('./resolvers/reason');
+const AttachmentResolver = require('./resolvers/attachment');
 const SmappeeResolver = require ('./resolvers/smappee');
 const permissions = require('./permissions');
 
-const { createMongoInstance, verifyToken } = require('./utils');
+const { createMongoInstance, createMailerQueueInstance, getArenaConfig, verifyToken } = require('./utils');
 
 const _ = require('lodash');
 const mongoAPI = require('./datasources/mongo');
 const smappeeAPI = require('./datasources/smappee');
 const notificationAPI = require('./datasources/notification');
+const mailAPI = require('./datasources/mail');
 
-const mongoInstance = createMongoInstance();
+var mongoInstance;
+var mailerQueueInstance;
+(async() => {
+    mongoInstance = await createMongoInstance();
+    mailerQueueInstance = await createMailerQueueInstance();
+})();
+
+
 
 const schema = applyMiddleware(
     makeExecutableSchema({
-        typeDefs: [ BaseTypeDef, UserTypeDef, PostTypeDef, NotificationTypeDef, ReasonTypeDef, SmappeeTypeDef ],
-        resolvers: _.merge( BaseResolver, UserResolver, PostResolver, NotificationResolver, ReasonResolver, SmappeeResolver )
+        typeDefs: [ BaseTypeDef, UserTypeDef, PostTypeDef, NotificationTypeDef, ReasonTypeDef, AttachmentTypeDef, SmappeeTypeDef ],
+        resolvers: _.merge( BaseResolver, UserResolver, PostResolver, NotificationResolver, ReasonResolver, AttachmentResolver, SmappeeResolver )
     }),
     permissions
 );
@@ -53,10 +65,16 @@ const server = new ApolloServer({
     dataSources: () => ({
         mongoAPI: new mongoAPI({ mongoInstance }),
         smappeeAPI: new smappeeAPI({}),
-        notificationAPI: new notificationAPI({})
-    }),
+        notificationAPI: new notificationAPI({}),
+        mailAPI: new mailAPI({ mailerQueueInstance })
+    })
 });
 
-server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
-    console.log(`Server ${JSON.stringify(process.env.APP_TITLE)} is ready at ${process.env.APP_HOST_URL}`);
-});
+const app = express();
+app.use(bodyParser.json({ limit: '200mb' }));
+app.use('/', getArenaConfig());
+server.applyMiddleware({ app });
+
+app.listen({ port: process.env.PORT || 4000 }, () =>
+  console.log(`Server ready at ${process.env.APP_HOST_URL}`)
+);

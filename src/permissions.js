@@ -2,7 +2,7 @@ const {
     AuthenticationError,
     UserInputError,
     ApolloError
-} = require('apollo-server');
+} = require('apollo-server-express');
 
 const { rule, shield, and, or, not } = require('graphql-shield');
 
@@ -23,6 +23,7 @@ const isAdmin = rule({ cache: 'contextual' })(
 module.exports = shield({
     Query: {
         ping: not(isAuthenticated),
+        mailTest: and(isAuthenticated, isAdmin),
         me: isAuthenticated,
         user: isAuthenticated,
         users: isAuthenticated,
@@ -35,7 +36,9 @@ module.exports = shield({
     },
     Mutation: { 
         login: not(isAuthenticated),
-        createUser: and(isAuthenticated, isAdmin),
+        getResetPasswordLink: not(isAuthenticated),
+        resetPassword: not(isAuthenticated),
+        createUser: not(isAuthenticated),
         updateUser: and(isAuthenticated, isAdmin),
         deleteUser: and(isAuthenticated, isAdmin),
         createPost: and(isAuthenticated, isAdmin),

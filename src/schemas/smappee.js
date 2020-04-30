@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server');
+const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
 
@@ -25,6 +25,11 @@ const typeDefs = gql`
         serviceLocations: ServiceLocationsResponse!
         serviceLocationElectricityConsumption(serviceLocationId:ID!, aggregation: Int!, from: Float!, to: Float! ): JSON!
         serviceLocationCostAnalysis(serviceLocationId:ID!, aggregation: Int!, from: Float!, to: Float! ): JSON!
+        
+    }
+
+    extend type Mutation {
+        sendBill(email: String!, serviceLocationId: ID!, aggregation: Int!, from: Float!, to: Float! ): JSON!
     }
 
     type ServiceLocationsResponse {

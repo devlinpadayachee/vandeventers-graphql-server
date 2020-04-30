@@ -309,7 +309,7 @@ _.forEach(tempData, (item, index) => {
       </td>
       
       <td>
-          R${item.cost}
+          R${item.cost.toFixed(2)}
       </td>
     </tr>
   `
@@ -495,7 +495,7 @@ return `<!doctype html>
                   <td></td>
                   
                   <td>
-                    Total: R${total}
+                    Total: R${total.toFixed(2)}
                   </td>
               </tr>
           </table>

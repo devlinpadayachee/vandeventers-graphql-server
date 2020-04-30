@@ -25,7 +25,7 @@ const typeDefs = gql`
         users(limit:Int!, skip:Int!, query: JSON!): UsersResponse!
     }
 
-    type Mutation {
+    extend type Mutation {
         login(email: String!, password: String!): LoginResponse!
         getResetPasswordLink(email: String!): JSON!
         resetPassword(resetToken: String!, password: String!): UserUpdatedResponse!

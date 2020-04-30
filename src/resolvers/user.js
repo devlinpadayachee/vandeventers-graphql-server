@@ -43,7 +43,7 @@ module.exports = {
             });
             const populatedTemplate = `<a href="${constructedURL}">Click here to reset your password</a>`
             var job = context.dataSources.mailAPI.sendMail(user.email, 'Password Reset', populatedTemplate);
-            return job;
+            if (job) return job;
             throw new ApolloError('Could not generate password reset link mailer', 'ACTION_NOT_COMPLETED', {});
         },
         resetPassword: async (parent, args, context, info) => {

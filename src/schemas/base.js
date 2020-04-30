@@ -7,6 +7,10 @@ const typeDefs = gql`
         mailTest: JSON!
     }
 
+    type Mutation {
+        changeConfig: String!
+    }
+
     scalar JSON
     scalar JSONObject
 

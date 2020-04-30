@@ -9,7 +9,6 @@ const typeDefs = gql`
         role: Role!
         pushToken: String
         location: JSON
-        serviceLocations: JSON
         metaData: JSON
         profilePicture: ID
         homePicture: ID
@@ -49,7 +48,6 @@ const typeDefs = gql`
         role: Role
         pushToken: String
         location: JSON
-        serviceLocations: JSON
         metaData: JSON
         profilePicture: ID
         homePicture: ID

@@ -151,7 +151,7 @@ module.exports.getJWT = ( user ) => {
     user = user.toJSON();
     user.id = user._id;
     delete user._id;
-    const token = jwt.sign(user, 'nuhome_jwt_secret'); //Using toJson because user is a mongoose object
+    const token = jwt.sign(user, 'appfrica_jwt_secret'); //Using toJson because user is a mongoose object
     resolve(token);
   })
 };
@@ -160,7 +160,7 @@ module.exports.verifyToken = (token) => {
   return new Promise((resolve, reject) => {
     try {
       if (token) {
-        resolve(jwt.verify(token, 'nuhome_jwt_secret'));
+        resolve(jwt.verify(token, 'appfrica_jwt_secret'));
       }
       resolve(null);
     } catch (err) {

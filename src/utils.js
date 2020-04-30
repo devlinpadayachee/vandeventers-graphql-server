@@ -425,7 +425,7 @@ return `<!doctype html>
                       <table>
                           <tr>
                               <td class="title">
-                                  <img src="https://nuhome-graphql-client.herokuapp.com/img/logo.ff72e2e1.png" style="width:100%; max-width:100px;">
+                                  <img src="https://appfrica-graphql-client.herokuapp.com/img/logo.ff72e2e1.png" style="width:100%; max-width:100px;">
                               </td>
                               
                               <td>

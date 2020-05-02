@@ -10,8 +10,7 @@ const typeDefs = gql`
         pushToken: String
         location: JSON
         metaData: JSON
-        profilePicture: ID
-        homePicture: ID
+        profilePicture: String
         loginCounter: Int
         resetToken: String
         createdAt: Float!
@@ -49,8 +48,7 @@ const typeDefs = gql`
         pushToken: String
         location: JSON
         metaData: JSON
-        profilePicture: ID
-        homePicture: ID
+        profilePicture: String
         loginCounter: Int
         resetToken: String
     }

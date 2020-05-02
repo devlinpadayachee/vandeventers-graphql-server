@@ -1,14 +1,17 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const pdf = require('html-pdf');
-var Queue = require('bull');
 const Arena = require('bull-arena');
 const isEmail = require('isemail');
 const moment =  require('moment');
 const _ =  require('lodash');
+const { Schema } = mongoose;
+var Queue = require('bull');
+var firebaseAdmin = require('firebase-admin');
+var firebaseServiceAccount = require('../firebase-service-account.json');
+
 
 module.exports.paginateResults = ({
   after: cursor,
@@ -137,6 +140,17 @@ module.exports.createMongoInstance = async () => {
     console.log('Skipped admin creation')
   }
   return { User, Post, Notification, Reason, Attachment };
+};
+
+module.exports.createFirebaseInstance = async () => {
+  
+  firebaseAdmin.initializeApp({
+    credential: firebaseAdmin.credential.cert(firebaseServiceAccount),
+    databaseURL: process.env.APP_FIREBASE_DB,
+    storageBucket: process.env.APP_FIREBASE_STORAGE_BUCKET
+  });
+  var defaultBucket = firebaseAdmin.storage().bucket();
+  return { firebaseAdmin, defaultBucket }  
 };
 
 module.exports.getPasswordHash = (password) => {

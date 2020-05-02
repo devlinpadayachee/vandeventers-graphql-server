@@ -21,17 +21,20 @@ const ReasonResolver = require('./resolvers/reason');
 const AttachmentResolver = require('./resolvers/attachment');
 const permissions = require('./permissions');
 
-const { createMongoInstance, createMailerQueueInstance, getArenaConfig, verifyToken } = require('./utils');
+const { createMongoInstance, createFirebaseInstance, createMailerQueueInstance, getArenaConfig, verifyToken } = require('./utils');
 
 const _ = require('lodash');
 const mongoAPI = require('./datasources/mongo');
+const firebaseAPI = require('./datasources/firebase');
 const notificationAPI = require('./datasources/notification');
 const mailAPI = require('./datasources/mail');
 
 var mongoInstance;
+var firebaseInstance;
 var mailerQueueInstance;
 (async() => {
     mongoInstance = await createMongoInstance();
+    firebaseInstance = await createFirebaseInstance();
     mailerQueueInstance = await createMailerQueueInstance();
 })();
 
@@ -61,6 +64,7 @@ const server = new ApolloServer({
     },
     dataSources: () => ({
         mongoAPI: new mongoAPI({ mongoInstance }),
+        firebaseAPI: new firebaseAPI({ firebaseInstance }),
         notificationAPI: new notificationAPI({}),
         mailAPI: new mailAPI({ mailerQueueInstance })
     })

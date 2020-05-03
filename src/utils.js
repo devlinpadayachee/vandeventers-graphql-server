@@ -56,13 +56,15 @@ module.exports.createMongoInstance = async () => {
   const userSchema = new Schema({
     username: {type: String, required: true},
     password: {type: String, required: true},
+    firstName: {type: String, required: true},
+    lastName: {type: String, required: true},
+    fullAddress: {type: String, required: true},
     email: {type: String, required: true, index: true, unique: true},
     role: {type: String, required: true, enum: ['admin', 'user']},
     pushToken: {type: String},
     location: {type: Object},
     metaData: {type: Object},
     profilePicture: {type: String},
-    homePicture: {type: String},
     loginCounter: Number,
     resetToken: {type: String},
     createdAt: Number,
@@ -128,6 +130,8 @@ module.exports.createMongoInstance = async () => {
     const adminUser = await User.create({
       username: 'admin',
       password,
+      firstName: 'appfrica',
+      lastName: 'admin',
       email: APP_DEFAULT_ADMIN_EMAIL,
       role: 'admin'
     });

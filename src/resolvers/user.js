@@ -6,6 +6,7 @@ const {
 const bcrypt = require('bcrypt');
 const isEmail = require('isemail');
 const shortid = require('shortid');
+const mime = require('mime-types')
 const { paginateResults, getPasswordHash, getJWT } = require('../utils');
 
 module.exports = {
@@ -71,6 +72,13 @@ module.exports = {
             throw new ApolloError('Could not create user', 'ACTION_NOT_COMPLETED', {});
         },
         updateUser: async (parent, args, context, info) => {
+            if (args?.user?.profilePicture){
+                console.log('Attempting to get fileUrl from FireBase');
+                let mimeType = args?.user?.profilePicture.match(/[^:]\w+\/[\w-+\d.]+(?=;|,)/)[0];
+                const fileUrl = await context.dataSources.firebaseAPI.uploadFile(mime.extension(mimeType), `profile-pictures/${context.user.id}`, { working: true }, mimeType, args?.user?.profilePicture);
+                console.log(fileUrl)
+                args.user.profilePicture = fileUrl;
+            }
             const updated = await context.dataSources.mongoAPI.updateUser(args.user);
             if (updated) return updated;
             throw new ApolloError('Could not update user', 'ACTION_NOT_COMPLETED', {});

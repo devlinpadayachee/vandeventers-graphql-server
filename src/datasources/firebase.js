@@ -4,6 +4,7 @@ const {
   ApolloError
 } = require('apollo-server-express');
 const { DataSource } = require('apollo-datasource');
+const UUID = require("uuid-v4");
 
 class firebaseAPI extends DataSource {
   constructor({ firebaseInstance }) {
@@ -20,11 +21,21 @@ class firebaseAPI extends DataSource {
   async uploadFile(ext, fileName, metaData, contentType, content) {
     try {
       var file = this.defaultBucket.file(`${fileName}.${ext}`);
+      const base64Text = content.split(';base64,').pop();
+      const fileBuffer = Buffer.from(base64Text, 'base64');
+      metaData.firebaseStorageDownloadTokens = UUID();
       try {
-        const upload = await file.save(content);
-        const fileUrl = await file.getSignedUrl({action: 'read', expires: '03-09-2500'});
-        await file.setMetadata({ contentType: contentType, metadata: metaData });
-        return fileUrl[0];
+        const upload = await file.save(fileBuffer, {
+          gzip: true,
+          metadata: {
+              contentType,
+              metadata: metaData
+          },
+        });
+        await file.makePublic();
+        const fileData = await file.getMetadata()
+        const url = fileData[0].mediaLink
+        return url;
       } catch (e) {
         throw new ApolloError(e.message, 'FILE_UPLOAD_FAILED', {});
       }

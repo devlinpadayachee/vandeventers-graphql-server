@@ -5,6 +5,9 @@ const typeDefs = gql`
     type User {
         id: ID!
         username: String!
+        firstName: String!
+        lastName: String!
+        fullAddress: String!
         email: String!
         role: Role!
         pushToken: String
@@ -35,6 +38,9 @@ const typeDefs = gql`
     input UserCreateInput {
         username: String!
         password: String!
+        firstName: String!
+        lastName: String!
+        fullAddress: String!
         email: String!
         role: Role!
     }
@@ -43,6 +49,9 @@ const typeDefs = gql`
         id: ID!
         username: String
         password: String
+        firstName: String
+        lastName: String
+        fullAddress: String
         email: String
         role: Role
         pushToken: String

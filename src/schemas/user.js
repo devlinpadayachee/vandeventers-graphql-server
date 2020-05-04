@@ -9,6 +9,9 @@ const typeDefs = gql`
         lastName: String!
         fullAddress: String!
         email: String!
+        bio: String
+        title: String
+        industry: String
         role: Role!
         pushToken: String
         location: JSON
@@ -42,6 +45,9 @@ const typeDefs = gql`
         lastName: String!
         fullAddress: String!
         email: String!
+        bio: String
+        title: String
+        industry: String
         role: Role!
     }
 
@@ -53,6 +59,9 @@ const typeDefs = gql`
         lastName: String
         fullAddress: String
         email: String
+        bio: String
+        title: String
+        industry: String
         role: Role
         pushToken: String
         location: JSON

@@ -75,7 +75,7 @@ module.exports = {
             if (args?.user?.profilePicture){
                 console.log('Attempting to get fileUrl from FireBase');
                 let mimeType = args?.user?.profilePicture.match(/[^:]\w+\/[\w-+\d.]+(?=;|,)/)[0];
-                const fileUrl = await context.dataSources.firebaseAPI.uploadFile(mime.extension(mimeType), `profile-pictures/${context.user.id}`, { working: true }, mimeType, args?.user?.profilePicture);
+                const fileUrl = await context.dataSources.firebaseAPI.uploadFile(mime.extension(mimeType), `profile-pictures/${args.user.id}`, { working: true }, mimeType, args?.user?.profilePicture);
                 console.log(fileUrl)
                 args.user.profilePicture = fileUrl;
             }

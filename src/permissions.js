@@ -8,22 +8,29 @@ const { rule, shield, and, or, not } = require('graphql-shield');
 
 // Rules
 
+const isOpen= rule({ cache: 'contextual' })(
+    async (parent, args, context, info) => {
+        return true;
+    },
+)
+
 const isAuthenticated = rule({ cache: 'contextual' })(
     async (parent, args, context, info) => {
-        return context.user !== null ? true : new ApolloError("Not Authorized", 'NOT_AUTHORIZED')
+        return context.user !== null ? true : new ApolloError("Not Authorized", 'NOT_AUTHORIZED');
     },
 )
 
 const isAdmin = rule({ cache: 'contextual' })(
     async (parent, args, context, info) => {
-        return context.user.role === 'admin' ? true :  new ApolloError("Only admins can perform this function", 'NOT_AUTHORIZED')
+        return context.user.role === 'admin' ? true :  new ApolloError("Only admins can perform this function", 'NOT_AUTHORIZED');
     },
 )
 
 module.exports = shield({
     Query: {
-        ping: not(isAuthenticated),
+        ping: isOpen,
         mailTest: and(isAuthenticated, isAdmin),
+        fileUploadTest: and(isAuthenticated, isAdmin),
         me: isAuthenticated,
         user: isAuthenticated,
         users: isAuthenticated,
@@ -35,11 +42,11 @@ module.exports = shield({
         reasons: isAuthenticated,
     },
     Mutation: { 
-        login: not(isAuthenticated),
-        getResetPasswordLink: not(isAuthenticated),
-        resetPassword: not(isAuthenticated),
-        createUser: not(isAuthenticated),
-        updateUser: and(isAuthenticated, isAdmin),
+        login: isOpen,
+        getResetPasswordLink: isOpen,
+        resetPassword: isOpen,
+        createUser: isOpen,
+        updateUser: and(isAuthenticated),
         deleteUser: and(isAuthenticated, isAdmin),
         createPost: and(isAuthenticated, isAdmin),
         updatePost: and(isAuthenticated, isAdmin),

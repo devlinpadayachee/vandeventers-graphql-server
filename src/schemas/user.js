@@ -5,13 +5,18 @@ const typeDefs = gql`
     type User {
         id: ID!
         username: String!
+        firstName: String!
+        lastName: String!
+        fullAddress: String!
         email: String!
+        bio: String
+        title: String
+        industry: String
         role: Role!
         pushToken: String
         location: JSON
         metaData: JSON
-        profilePicture: ID
-        homePicture: ID
+        profilePicture: String
         loginCounter: Int
         resetToken: String
         createdAt: Float!
@@ -28,6 +33,7 @@ const typeDefs = gql`
         login(email: String!, password: String!): LoginResponse!
         getResetPasswordLink(email: String!): JSON!
         resetPassword(resetToken: String!, password: String!): UserUpdatedResponse!
+        sendUserToUserEmailMessage(to: ID!, from: ID!, message: String!): JSON!
         createUser(user: UserCreateInput): User!
         updateUser(user: UserUpdateInput): UserUpdatedResponse! 
         deleteUser(id: ID!): UserDeletedResponse! 
@@ -36,7 +42,13 @@ const typeDefs = gql`
     input UserCreateInput {
         username: String!
         password: String!
+        firstName: String!
+        lastName: String!
+        fullAddress: String!
         email: String!
+        bio: String
+        title: String
+        industry: String
         role: Role!
     }
 
@@ -44,13 +56,18 @@ const typeDefs = gql`
         id: ID!
         username: String
         password: String
+        firstName: String
+        lastName: String
+        fullAddress: String
         email: String
+        bio: String
+        title: String
+        industry: String
         role: Role
         pushToken: String
         location: JSON
         metaData: JSON
-        profilePicture: ID
-        homePicture: ID
+        profilePicture: String
         loginCounter: Int
         resetToken: String
     }

@@ -19,6 +19,7 @@
     "bull-arena": "^2.8.1",
     "dotenv": "^8.2.0",
     "expo-server-sdk": "^3.5.0",
+    "firebase-admin": "^8.11.0",
     "graphql": "^14.6.0",
     "graphql-middleware": "^4.0.2",
     "graphql-shield": "^7.2.0",
@@ -27,10 +28,12 @@
     "isemail": "^3.2.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
+    "mime-types": "^2.1.27",
     "moment": "^2.24.0",
     "mongoose": "^5.9.4",
     "nodemailer": "^6.4.6",
     "qs": "^6.9.2",
-    "shortid": "^2.2.15"
+    "shortid": "^2.2.15",
+    "uuid-v4": "^0.1.0"
   }
 }

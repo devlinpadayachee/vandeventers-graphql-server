@@ -64,10 +64,7 @@ const server = new ApolloServer({
     },
     dataSources: () => ({
         mongoAPI: new mongoAPI({ mongoInstance }),
-<<<<<<< HEAD
-=======
         firebaseAPI: new firebaseAPI({ firebaseInstance }),
->>>>>>> 3be57fc318399e055b9144259b4e32ae26f0d5af
         notificationAPI: new notificationAPI({}),
         mailAPI: new mailAPI({ mailerQueueInstance })
     })

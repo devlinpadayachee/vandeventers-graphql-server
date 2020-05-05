@@ -136,6 +136,7 @@ module.exports.createMongoInstance = async () => {
       password,
       firstName: 'appfrica',
       lastName: 'admin',
+      fullAddress: '1 Sjampanje Street, Wilgeheuwel',
       email: APP_DEFAULT_ADMIN_EMAIL,
       role: 'admin'
     });

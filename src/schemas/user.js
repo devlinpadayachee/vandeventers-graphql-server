@@ -33,6 +33,7 @@ const typeDefs = gql`
         login(email: String!, password: String!): LoginResponse!
         getResetPasswordLink(email: String!): JSON!
         resetPassword(resetToken: String!, password: String!): UserUpdatedResponse!
+        sendUserToUserEmailMessage(to: ID!, from: ID!, message: String!): JSON!
         createUser(user: UserCreateInput): User!
         updateUser(user: UserUpdateInput): UserUpdatedResponse! 
         deleteUser(id: ID!): UserDeletedResponse! 

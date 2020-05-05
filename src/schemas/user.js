@@ -8,11 +8,14 @@ const typeDefs = gql`
         firstName: String!
         lastName: String!
         fullAddress: String!
+        telNumber: String!
+        handicap: String!
         email: String!
         bio: String
         title: String
         industry: String
         role: Role!
+        branch: ID
         pushToken: String
         location: JSON
         metaData: JSON
@@ -45,11 +48,14 @@ const typeDefs = gql`
         firstName: String!
         lastName: String!
         fullAddress: String!
+        telNumber: String!
+        handicap: String!
         email: String!
         bio: String
         title: String
         industry: String
         role: Role!
+        branch: ID
     }
 
     input UserUpdateInput {
@@ -59,11 +65,14 @@ const typeDefs = gql`
         firstName: String
         lastName: String
         fullAddress: String
+        telNumber: String
+        handicap: String
         email: String
         bio: String
         title: String
         industry: String
         role: Role
+        branch: ID
         pushToken: String
         location: JSON
         metaData: JSON

@@ -64,12 +64,22 @@ module.exports.createMongoInstance = async () => {
     title: {type: String},
     industry: {type: String},
     role: {type: String, required: true, enum: ['admin', 'user']},
+    branch: {type: String},
     pushToken: {type: String},
     location: {type: Object},
     metaData: {type: Object},
     profilePicture: {type: String},
     loginCounter: Number,
     resetToken: {type: String},
+    createdAt: Number,
+    updatedAt: Number,
+  },{
+    timestamps: { currentTime: () => Date.now() }
+  });
+
+  const branchSchema = new Schema({
+    name: {type: String, required: true},
+    createdBy: {type: Schema.Types.ObjectId, required: true},
     createdAt: Number,
     updatedAt: Number,
   },{
@@ -122,6 +132,7 @@ module.exports.createMongoInstance = async () => {
   const User = mongoose.model('User', userSchema);
   const Post = mongoose.model('Post', postSchema);
   const Notification = mongoose.model('Notification', notificationSchema);
+  const Branch = mongoose.model('Branch', branchSchema);
   const Reason = mongoose.model('Reason', reasonSchema);
   const Attachment = mongoose.model('Attachment', attachmentSchema);
  
@@ -148,7 +159,7 @@ module.exports.createMongoInstance = async () => {
   } else {
     console.log('Skipped admin creation')
   }
-  return { User, Post, Notification, Reason, Attachment };
+  return { User, Post, Notification, Reason, Branch, Attachment };
 };
 
 module.exports.createFirebaseInstance = async () => {

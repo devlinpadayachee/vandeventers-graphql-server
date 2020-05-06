@@ -6,12 +6,21 @@ const typeDefs = gql`
         id: ID!
         username: String!
         email: String!
+        branch: ID
+        branchName: String
+        firstName: String!
+        lastName: String!
+        fullAddress: String!
+        telNumber: String
+        title: String
+        industry: String
+        bio: String
+        rating: Int
         role: Role!
         pushToken: String
         location: JSON
         metaData: JSON
-        profilePicture: ID
-        homePicture: ID
+        profilePicture: String
         loginCounter: Int
         resetToken: String
         createdAt: Float!
@@ -28,6 +37,7 @@ const typeDefs = gql`
         login(email: String!, password: String!): LoginResponse!
         getResetPasswordLink(email: String!): JSON!
         resetPassword(resetToken: String!, password: String!): UserUpdatedResponse!
+        sendUserToUserEmailMessage(to: ID!, from: ID!, message: String!): JSON!
         createUser(user: UserCreateInput): User!
         updateUser(user: UserUpdateInput): UserUpdatedResponse! 
         deleteUser(id: ID!): UserDeletedResponse! 
@@ -36,21 +46,38 @@ const typeDefs = gql`
     input UserCreateInput {
         username: String!
         password: String!
+        firstName: String!
+        lastName: String!
+        fullAddress: String!
+        telNumber: String!
+        rating: Int
         email: String!
+        bio: String
+        title: String
+        industry: String
         role: Role!
+        branch: ID
     }
 
     input UserUpdateInput {
         id: ID!
         username: String
         password: String
+        firstName: String
+        lastName: String
+        fullAddress: String
+        telNumber: String
+        rating: Int
         email: String
+        bio: String
+        title: String
+        industry: String
         role: Role
+        branch: ID
         pushToken: String
         location: JSON
         metaData: JSON
-        profilePicture: ID
-        homePicture: ID
+        profilePicture: String
         loginCounter: Int
         resetToken: String
     }

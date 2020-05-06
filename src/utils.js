@@ -1,14 +1,17 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const pdf = require('html-pdf');
-var Queue = require('bull');
 const Arena = require('bull-arena');
 const isEmail = require('isemail');
 const moment =  require('moment');
 const _ =  require('lodash');
+const { Schema } = mongoose;
+var Queue = require('bull');
+var firebaseAdmin = require('firebase-admin');
+var firebaseServiceAccount = require('../firebase-service-account.json');
+
 
 module.exports.paginateResults = ({
   after: cursor,
@@ -53,16 +56,32 @@ module.exports.createMongoInstance = async () => {
   const userSchema = new Schema({
     username: {type: String, required: true},
     password: {type: String, required: true},
+    firstName: {type: String, required: true},
+    lastName: {type: String, required: true},
+    fullAddress: {type: String, required: true},
+    telNumber: {type: String},
+    rating: Number,
     email: {type: String, required: true, index: true, unique: true},
+    bio:  {type: String},
+    title: {type: String},
+    industry: {type: String},
     role: {type: String, required: true, enum: ['admin', 'user']},
+    branch: {type: String},
     pushToken: {type: String},
     location: {type: Object},
-    serviceLocations: {type: [String]},
     metaData: {type: Object},
     profilePicture: {type: String},
-    homePicture: {type: String},
     loginCounter: Number,
     resetToken: {type: String},
+    createdAt: Number,
+    updatedAt: Number,
+  },{
+    timestamps: { currentTime: () => Date.now() }
+  });
+
+  const branchSchema = new Schema({
+    name: {type: String, required: true},
+    createdBy: {type: Schema.Types.ObjectId, required: true},
     createdAt: Number,
     updatedAt: Number,
   },{
@@ -72,6 +91,7 @@ module.exports.createMongoInstance = async () => {
   const postSchema = new Schema({
     title: {type: String, required: true},
     content: {type: String, required: true},
+    featurePicture: {type: String},
     createdBy: {type: Schema.Types.ObjectId, required: true},
     createdAt: Number,
     updatedAt: Number,
@@ -114,6 +134,7 @@ module.exports.createMongoInstance = async () => {
   const User = mongoose.model('User', userSchema);
   const Post = mongoose.model('Post', postSchema);
   const Notification = mongoose.model('Notification', notificationSchema);
+  const Branch = mongoose.model('Branch', branchSchema);
   const Reason = mongoose.model('Reason', reasonSchema);
   const Attachment = mongoose.model('Attachment', attachmentSchema);
  
@@ -126,6 +147,9 @@ module.exports.createMongoInstance = async () => {
     const adminUser = await User.create({
       username: 'admin',
       password,
+      firstName: 'appfrica',
+      lastName: 'admin',
+      fullAddress: '1 Sjampanje Street, Wilgeheuwel',
       email: APP_DEFAULT_ADMIN_EMAIL,
       role: 'admin'
     });
@@ -137,7 +161,18 @@ module.exports.createMongoInstance = async () => {
   } else {
     console.log('Skipped admin creation')
   }
-  return { User, Post, Notification, Reason, Attachment };
+  return { User, Post, Notification, Reason, Branch, Attachment };
+};
+
+module.exports.createFirebaseInstance = async () => {
+  
+  firebaseAdmin.initializeApp({
+    credential: firebaseAdmin.credential.cert(firebaseServiceAccount),
+    databaseURL: process.env.APP_FIREBASE_DB,
+    storageBucket: process.env.APP_FIREBASE_STORAGE_BUCKET
+  });
+  var defaultBucket = firebaseAdmin.storage().bucket();
+  return { firebaseAdmin, defaultBucket }  
 };
 
 module.exports.getPasswordHash = (password) => {
@@ -288,222 +323,158 @@ module.exports.getArenaConfig = () => {
   return arenaConfig;
 };
 
-module.exports.getHTMLBill = (user, serviceLocationCostAnalysis) => {
-
-var tempData = serviceLocationCostAnalysis.map((item, index) => {
-    return { 
-        appliance: item.appliance.name, 
-        cost: item.cost.value, 
-    }
-})
-tempData = _.orderBy(tempData, ['cost'], ['desc']);
-
-var total = 0
-var billingSection = ''
-
-_.forEach(tempData, (item, index) => {
-  billingSection += `
-    <tr ${ index === tempData.length-1 ? 'class="item last"' : 'class="item"' }>
-      <td>
-          ${item.appliance}
-      </td>
-      
-      <td>
-          R${item.cost.toFixed(2)}
-      </td>
-    </tr>
-  `
-  total += item.cost
-})
+module.exports.getUserToUserMailTemplate = (toUser, fromUser, message) => {
 
 return `<!doctype html>
-<html>
-  <head>
-      <meta charset="utf-8">
-      <title>NuHome Invoice</title>
-      
-      <style>
-      .invoice-box {
-          max-width: 800px;
-          margin: auto;
-          padding: 30px;
-          border: 1px solid #eee;
-          box-shadow: 0 0 10px rgba(0, 0, 0, .15);
-          font-size: 16px;
-          line-height: 24px;
-          font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
-          color: #555;
-      }
-      
-      .invoice-box table {
-          width: 100%;
-          line-height: inherit;
-          text-align: left;
-      }
-      
-      .invoice-box table td {
-          padding: 5px;
-          vertical-align: top;
-      }
-      
-      .invoice-box table tr td:nth-child(2) {
-          text-align: right;
-      }
-      
-      .invoice-box table tr.top table td {
-          padding-bottom: 20px;
-      }
-      
-      .invoice-box table tr.top table td.title {
-          font-size: 45px;
-          line-height: 45px;
-          color: #333;
-      }
-      
-      .invoice-box table tr.information table td {
-          padding-bottom: 40px;
-      }
-      
-      .invoice-box table tr.heading td {
-          background: #eee;
-          border-bottom: 1px solid #ddd;
-          font-weight: bold;
-      }
-      
-      .invoice-box table tr.details td {
-          padding-bottom: 20px;
-      }
-      
-      .invoice-box table tr.item td{
-          border-bottom: 1px solid #eee;
-      }
-      
-      .invoice-box table tr.item.last td {
-          border-bottom: none;
-      }
-      
-      .invoice-box table tr.total td:nth-child(2) {
-          border-top: 2px solid #eee;
-          font-weight: bold;
-      }
-      
-      @media only screen and (max-width: 600px) {
-          .invoice-box table tr.top table td {
-              width: 100%;
-              display: block;
-              text-align: center;
-          }
-          
-          .invoice-box table tr.information table td {
-              width: 100%;
-              display: block;
-              text-align: center;
-          }
-      }
-      
-      /** RTL **/
-      .rtl {
-          direction: rtl;
-          font-family: Tahoma, 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
-      }
-      
-      .rtl table {
-          text-align: right;
-      }
-      
-      .rtl table tr td:nth-child(2) {
-          text-align: left;
-      }
-      </style>
-  </head>
-  ​
-  <body>
-      <div class="invoice-box">
-          <table cellpadding="0" cellspacing="0">
-              <tr class="top">
-                  <td colspan="2">
-                      <table>
-                          <tr>
-                              <td class="title">
-                                  <img src="https://appfrica-graphql-client.herokuapp.com/img/logo.ff72e2e1.png" style="width:100%; max-width:100px;">
-                              </td>
-                              
-                              <td>
-                                  Invoice #: 123<br>
-                                  Created: ${moment().format('LLL')}<br>
-                                  Due: ${ moment().endOf('month').format('LLL')}
-                              </td>
-                          </tr>
-                      </table>
-                  </td>
-              </tr>
-              
-              <tr class="information">
-                  <td colspan="2">
-                      <table>
-                          <tr>
-                              <td>
-                                  Nuvo Energy<br>
-                                  140a Kelvin Drive<br>
-                                  Morningside Manor
-                                  2196
-                              </td>
-                              
-                              <td>
-                                  ${user.username}<br>
-                                  ${user.email}<br>
-                                  ${user.serviceLocations[0]}<br>
-                              </td>
-                          </tr>
-                      </table>
-                  </td>
-              </tr>
-              <!--
-              <tr class="heading">
-                  <td>
-                      Payment Method
-                  </td>
-                  
-                  <td>
-                      Check #
-                  </td>
-              </tr>
-              
-              <tr class="details">
-                  <td>
-                      EFT:  STandard Bank
-                  </td>
-                  
-                  <td>
-                      1000
-                  </td>
-              </tr>
-              -->
-              <tr class="heading">
-                  <td>
-                      Item
-                  </td>
-                  
-                  <td>
-                      Price
-                  </td>
-              </tr>
+  <html>
+    <head>
+        <meta charset="utf-8">
+        <title>OnlineTeeBox Message</title>
+        
+        <style>
+        .message-box {
+            max-width: 800px;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #eee;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .15);
+            font-size: 16px;
+            line-height: 24px;
+            font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+            color: #555;
+        }
+        
+        .message-box table {
+            width: 100%;
+            line-height: inherit;
+            text-align: left;
+        }
+        
+        .message-box table td {
+            padding: 5px;
+            vertical-align: top;
+        }
+        
+        .message-box table tr td:nth-child(2) {
+            text-align: right;
+        }
+        
+        .message-box table tr.top table td {
+            padding-bottom: 20px;
+        }
+        
+        .message-box table tr.top table td.title {
+            font-size: 45px;
+            line-height: 45px;
+            color: #333;
+        }
+        
+        .message-box table tr.information table td {
+            padding-bottom: 40px;
+        }
+        
+        .message-box table tr.heading td {
+            background: #eee;
+            border-bottom: 1px solid #ddd;
+            font-weight: bold;
+            padding: 30px;
+        }
+        
+        .message-box table tr.details td {
+            padding-bottom: 20px;
+        }
+        
+        .message-box table tr.item td{
+            border-bottom: 1px solid #eee;
+        }
+        
+        .message-box table tr.item.last td {
+            border-bottom: none;
+        }
+        
+        .message-box table tr.total td:nth-child(2) {
+            border-top: 2px solid #eee;
+            font-weight: bold;
+        }
+        
+        @media only screen and (max-width: 600px) {
+            .message-box table tr.top table td {
+                width: 100%;
+                display: block;
+                text-align: center;
+            }
+            
+            .message-box table tr.information table td {
+                width: 100%;
+                display: block;
+                text-align: center;
+            }
+        }
+        
+        /** RTL **/
+        .rtl {
+            direction: rtl;
+            font-family: Tahoma, 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+        }
+        
+        .rtl table {
+            text-align: right;
+        }
+        
+        .rtl table tr td:nth-child(2) {
+            text-align: left;
+        }
+        </style>
+    </head>
+    â€‹
+    <body>
+        <div class="message-box">
+            <table cellpadding="0" cellspacing="0">
+                <tr class="top">
+                    <td colspan="2">
+                        <table>
+                            <tr>
+                                <td class="title">
+                                    <img src="https://nuhome-graphql-client.herokuapp.com/img/logo.ff72e2e1.png" style="width:100%; max-width:100px;">
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
 
-              ${billingSection}
-                          
-              <tr class="total">
-                  <td></td>
-                  
-                  <td>
-                    Total: R${total.toFixed(2)}
-                  </td>
-              </tr>
-          </table>
-      </div>
-  </body>
-</html>`
-}
-
+                <tr class="information">
+                    <td colspan="2">
+                        <table>
+                            <tr>
+                                <td>
+                                  ${fromUser.firstName} ${fromUser.lastName} sent you a message:<br>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr class="heading" colspan="2">
+                    <td>
+                      ${message}
+                    </td>
+                </tr>        
+                <tr class="information">
+                    <td colspan="2">
+                        <table>
+                            <tr>
+                                <td>
+                                  You can get back to me at <a href="${process.env.APP_CLIENT_URL}">Appfrica</a><br> 
+                                  or contact me directly at ${fromUser.email}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </body>
+  </html>`
+  }
 
 
 

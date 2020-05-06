@@ -5,6 +5,7 @@ const typeDefs = gql`
     type Query {
         ping: String!
         mailTest: JSON!
+        fileUploadTest: String!
     }
 
     type Mutation {

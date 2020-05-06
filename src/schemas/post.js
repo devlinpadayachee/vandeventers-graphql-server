@@ -6,6 +6,7 @@ const typeDefs = gql`
         id: ID!
         title: String!
         content: String!
+        featurePicture: String
         createdBy: ID!
         createdAt: Float!
         updatedAt: Float!
@@ -37,6 +38,7 @@ const typeDefs = gql`
         id: ID!
         title: String
         content: String
+        featurePicture: String
     }
 
     type PostUpdatedResponse {

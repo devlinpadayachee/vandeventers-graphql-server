@@ -9,29 +9,34 @@ const bodyParser = require ('body-parser');
 const { applyMiddleware } = require ('graphql-middleware');
 const BaseTypeDef = require ('./schemas/base');
 const UserTypeDef = require ('./schemas/user');
+const BranchTypeDef = require ('./schemas/branch');
 const PostTypeDef = require ('./schemas/post');
 const NotificationTypeDef = require ('./schemas/notification');
 const ReasonTypeDef = require ('./schemas/reason');
 const AttachmentTypeDef = require ('./schemas/attachment');
 const BaseResolver = require('./resolvers/base');
 const UserResolver = require('./resolvers/user');
+const BranchResolver = require('./resolvers/branch');
 const PostResolver = require('./resolvers/post');
 const NotificationResolver = require('./resolvers/notification');
 const ReasonResolver = require('./resolvers/reason');
 const AttachmentResolver = require('./resolvers/attachment');
 const permissions = require('./permissions');
 
-const { createMongoInstance, createMailerQueueInstance, getArenaConfig, verifyToken } = require('./utils');
+const { createMongoInstance, createFirebaseInstance, createMailerQueueInstance, getArenaConfig, verifyToken } = require('./utils');
 
 const _ = require('lodash');
 const mongoAPI = require('./datasources/mongo');
+const firebaseAPI = require('./datasources/firebase');
 const notificationAPI = require('./datasources/notification');
 const mailAPI = require('./datasources/mail');
 
 var mongoInstance;
+var firebaseInstance;
 var mailerQueueInstance;
 (async() => {
     mongoInstance = await createMongoInstance();
+    firebaseInstance = await createFirebaseInstance();
     mailerQueueInstance = await createMailerQueueInstance();
 })();
 
@@ -39,8 +44,8 @@ var mailerQueueInstance;
 
 const schema = applyMiddleware(
     makeExecutableSchema({
-        typeDefs: [ BaseTypeDef, UserTypeDef, PostTypeDef, NotificationTypeDef, ReasonTypeDef, AttachmentTypeDef ],
-        resolvers: _.merge( BaseResolver, UserResolver, PostResolver, NotificationResolver, ReasonResolver, AttachmentResolver )
+        typeDefs: [ BaseTypeDef, UserTypeDef, BranchTypeDef, PostTypeDef, NotificationTypeDef, ReasonTypeDef, AttachmentTypeDef ],
+        resolvers: _.merge( BaseResolver, UserResolver, BranchResolver, PostResolver, NotificationResolver, ReasonResolver, AttachmentResolver )
     }),
     permissions
 );
@@ -61,6 +66,7 @@ const server = new ApolloServer({
     },
     dataSources: () => ({
         mongoAPI: new mongoAPI({ mongoInstance }),
+        firebaseAPI: new firebaseAPI({ firebaseInstance }),
         notificationAPI: new notificationAPI({}),
         mailAPI: new mailAPI({ mailerQueueInstance })
     })

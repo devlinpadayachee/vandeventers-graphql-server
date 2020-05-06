@@ -463,7 +463,7 @@ return `<!doctype html>
                         <table>
                             <tr>
                                 <td>
-                                  You can get back to me at <a href="${process.env.APP_CLIENT_URL}">Appfrica</a><br> 
+                                  You can get back to me at <a href="${process.env.APP_CLIENT_URL}">OnlineTeeBox</a><br> 
                                   or contact me directly at ${fromUser.email}
                                 </td>
                             </tr>

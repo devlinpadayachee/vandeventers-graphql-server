@@ -5,17 +5,18 @@ const typeDefs = gql`
     type User {
         id: ID!
         username: String!
+        email: String!
+        branch: ID
+        branchName: String
         firstName: String!
         lastName: String!
         fullAddress: String!
-        telNumber: String!
-        handicap: String!
-        email: String!
-        bio: String
+        telNumber: String
         title: String
         industry: String
+        bio: String
+        rating: Int
         role: Role!
-        branch: ID
         pushToken: String
         location: JSON
         metaData: JSON
@@ -49,7 +50,7 @@ const typeDefs = gql`
         lastName: String!
         fullAddress: String!
         telNumber: String!
-        handicap: String!
+        rating: Int
         email: String!
         bio: String
         title: String
@@ -66,7 +67,7 @@ const typeDefs = gql`
         lastName: String
         fullAddress: String
         telNumber: String
-        handicap: String
+        rating: Int
         email: String
         bio: String
         title: String

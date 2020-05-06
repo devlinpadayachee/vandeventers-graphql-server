@@ -97,4 +97,11 @@ module.exports = {
             throw new ApolloError('Could not delete user', 'ACTION_NOT_COMPLETED', {});
         },
     },
+    User: {
+        branchName: async (parent, args, context, info) => {
+            const branch = await context.dataSources.mongoAPI.branch(parent.branch);
+            if (!branch) return null;
+            return branch.name;
+        }
+    }
 };

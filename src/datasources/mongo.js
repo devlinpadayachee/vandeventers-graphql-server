@@ -104,7 +104,6 @@ class mongoAPI extends DataSource {
     try {
       if (!id) return null
       const branch = await this.Branch.findOne({ _id: id });
-      console.log(branch);
       return branch ? branch : null;
     } catch(e){
       console.log('Oops Something went wrong with finding the branch');

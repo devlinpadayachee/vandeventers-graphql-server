@@ -11,7 +11,6 @@ module.exports = {
             return branch;
         },
         branches: async (parent, args, context, info) => {
-            console.log('Querying Branches');
             const branches = await context.dataSources.mongoAPI.branches(args.limit, args.skip, args.query);
             return branches;
         }
@@ -23,7 +22,6 @@ module.exports = {
             throw new ApolloError('Could not create branch', 'ACTION_NOT_COMPLETED', {});
         },
         updateBranch: async (parent, args, context, info) => {
-            console.log(args);
             const updated = await context.dataSources.mongoAPI.updateBranch(args.branch);
             if (updated) return updated;
             throw new ApolloError('Could not update branch', 'ACTION_NOT_COMPLETED', {});

@@ -6,7 +6,8 @@ const {
 const bcrypt = require('bcrypt');
 const isEmail = require('isemail');
 const shortid = require('shortid');
-const { paginateResults, getPasswordHash, getJWT } = require('../utils');
+const mime = require('mime-types')
+const { paginateResults, getPasswordHash, getJWT, getUserToUserMailTemplate } = require('../utils');
 
 module.exports = {
     Query: {
@@ -34,7 +35,6 @@ module.exports = {
         getResetPasswordLink: async (parent, args, context, info) => {
             const user = await context.dataSources.mongoAPI.findUserbyEmail(args.email);
             if (!user) throw new UserInputError('Could not find user!');
-            const APP_DEFAULT_ADMIN_PASSWORD= process.env.APP_DEFAULT_ADMIN_PASSWORD || 'Sepiroth6043@';
             const resetToken = shortid.generate();
             var constructedURL = `${process.env.APP_CLIENT_URL}/#/password-reset/${resetToken}`;
             const updated = await context.dataSources.mongoAPI.updateUser({
@@ -59,6 +59,15 @@ module.exports = {
             if (updated) return updated;
             throw new ApolloError('Could not reset user password', 'ACTION_NOT_COMPLETED', {});
         },
+        sendUserToUserEmailMessage: async (parent, args, context, info) => {
+            const toUser = await context.dataSources.mongoAPI.user(args.to);
+            const fromUser = await context.dataSources.mongoAPI.user(args.from);
+            if (!toUser || !fromUser) throw new UserInputError('Could not find one of the users specified!');
+            const populatedTemplate  = await getUserToUserMailTemplate(toUser, fromUser, args.message);
+            var job = context.dataSources.mailAPI.sendMail(toUser.email, `OnlineTeeBox Message From ${fromUser.firstName} ${fromUser.lastName}`, populatedTemplate);
+            if (job) return job;
+            throw new ApolloError('Could not generate user to user message mailer', 'ACTION_NOT_COMPLETED', {});
+        },
         createUser: async (parent, args, context, info) => {
             if (!isEmail.validate(args.user.email)) {
                 throw new UserInputError('Email is invalid', {
@@ -71,6 +80,13 @@ module.exports = {
             throw new ApolloError('Could not create user', 'ACTION_NOT_COMPLETED', {});
         },
         updateUser: async (parent, args, context, info) => {
+            if (args?.user?.profilePicture){
+                console.log('Attempting to get fileUrl from FireBase');
+                let mimeType = args?.user?.profilePicture.match(/[^:]\w+\/[\w-+\d.]+(?=;|,)/)[0];
+                const fileUrl = await context.dataSources.firebaseAPI.uploadFile(mime.extension(mimeType), `profile-pictures/${args.user.id}`, { working: true }, mimeType, args?.user?.profilePicture);
+                console.log(fileUrl)
+                args.user.profilePicture = fileUrl;
+            }
             const updated = await context.dataSources.mongoAPI.updateUser(args.user);
             if (updated) return updated;
             throw new ApolloError('Could not update user', 'ACTION_NOT_COMPLETED', {});
@@ -81,4 +97,11 @@ module.exports = {
             throw new ApolloError('Could not delete user', 'ACTION_NOT_COMPLETED', {});
         },
     },
+    User: {
+        branchName: async (parent, args, context, info) => {
+            const branch = await context.dataSources.mongoAPI.branch(parent.branch);
+            if (!branch) return null;
+            return branch.name;
+        }
+    }
 };

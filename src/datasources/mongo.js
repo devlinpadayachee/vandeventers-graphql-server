@@ -10,6 +10,7 @@ class mongoAPI extends DataSource {
   constructor({ mongoInstance }) {
     super();
     this.User = mongoInstance.User;
+    this.Branch = mongoInstance.Branch;
     this.Post = mongoInstance.Post;
     this.Notification = mongoInstance.Notification;
     this.Reason = mongoInstance.Reason;
@@ -94,6 +95,63 @@ class mongoAPI extends DataSource {
       return user ? user : null;
     } catch(e){
       console.log('Oops Something went wrong with finding the user by email');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  //Branches
+  async branch(id) {
+    try {
+      if (!id) return null
+      const branch = await this.Branch.findOne({ _id: id });
+      return branch ? branch : null;
+    } catch(e){
+      console.log('Oops Something went wrong with finding the branch');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async branches(limit = 10, skip = 0, query = {}) {
+    try {
+      const count = await this.Branch.where(query).countDocuments();
+      if (skip >= count) {
+        skip = 0;
+      }
+      const records = await this.Branch.find(query).limit(limit).skip(skip);
+      return records.length > 0 ? { records, count } : { records : [], count: 0 };
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async createBranch(args) {
+    try {
+      const branch = await this.Branch.create(args);
+      return branch ? branch : null;
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async updateBranch(args) {
+    try {
+      const id = args.id
+      const updatedBranch = await this.Branch.findOneAndUpdate({ _id: id }, args, { new: true } );
+      return updatedBranch ? { id, updated: true, branch: updatedBranch } : { id, updated: false, branch: null };
+    } catch(e){
+      console.log('Oops Something went wrong');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async deleteBranch(id) {
+    try {
+      const deletedBranch = await this.Branch.deleteOne({ _id: id });
+      return deletedBranch.deletedCount > 0 ? { id, deleted: true, branch: deletedBranch } : { id, deleted: false, branch: null };
+    } catch(e){
+      console.log('Oops Something went wrong');
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }

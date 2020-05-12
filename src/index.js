@@ -9,6 +9,7 @@ const bodyParser = require ('body-parser');
 const { applyMiddleware } = require ('graphql-middleware');
 const BaseTypeDef = require ('./schemas/base');
 const UserTypeDef = require ('./schemas/user');
+const BranchTypeDef = require ('./schemas/branch');
 const PostTypeDef = require ('./schemas/post');
 const NotificationTypeDef = require ('./schemas/notification');
 const ReasonTypeDef = require ('./schemas/reason');
@@ -16,6 +17,7 @@ const AttachmentTypeDef = require ('./schemas/attachment');
 const SmappeeTypeDef = require ('./schemas/smappee');
 const BaseResolver = require('./resolvers/base');
 const UserResolver = require('./resolvers/user');
+const BranchResolver = require('./resolvers/branch');
 const PostResolver = require('./resolvers/post');
 const NotificationResolver = require('./resolvers/notification');
 const ReasonResolver = require('./resolvers/reason');
@@ -23,18 +25,21 @@ const AttachmentResolver = require('./resolvers/attachment');
 const SmappeeResolver = require ('./resolvers/smappee');
 const permissions = require('./permissions');
 
-const { createMongoInstance, createMailerQueueInstance, getArenaConfig, verifyToken } = require('./utils');
+const { createMongoInstance, createFirebaseInstance, createMailerQueueInstance, getArenaConfig, verifyToken } = require('./utils');
 
 const _ = require('lodash');
 const mongoAPI = require('./datasources/mongo');
-const smappeeAPI = require('./datasources/smappee');
+const firebaseAPI = require('./datasources/firebase');
 const notificationAPI = require('./datasources/notification');
 const mailAPI = require('./datasources/mail');
+const smappeeAPI = require('./datasources/smappee');
 
 var mongoInstance;
+var firebaseInstance;
 var mailerQueueInstance;
 (async() => {
     mongoInstance = await createMongoInstance();
+    firebaseInstance = await createFirebaseInstance();
     mailerQueueInstance = await createMailerQueueInstance();
 })();
 
@@ -42,8 +47,8 @@ var mailerQueueInstance;
 
 const schema = applyMiddleware(
     makeExecutableSchema({
-        typeDefs: [ BaseTypeDef, UserTypeDef, PostTypeDef, NotificationTypeDef, ReasonTypeDef, AttachmentTypeDef, SmappeeTypeDef ],
-        resolvers: _.merge( BaseResolver, UserResolver, PostResolver, NotificationResolver, ReasonResolver, AttachmentResolver, SmappeeResolver )
+        typeDefs: [ BaseTypeDef, UserTypeDef, BranchTypeDef, PostTypeDef, NotificationTypeDef, ReasonTypeDef, AttachmentTypeDef, SmappeeTypeDef ],
+        resolvers: _.merge( BaseResolver, UserResolver, BranchResolver, PostResolver, NotificationResolver, ReasonResolver, AttachmentResolver, SmappeeResolver )
     }),
     permissions
 );
@@ -64,9 +69,10 @@ const server = new ApolloServer({
     },
     dataSources: () => ({
         mongoAPI: new mongoAPI({ mongoInstance }),
-        smappeeAPI: new smappeeAPI({}),
+        firebaseAPI: new firebaseAPI({ firebaseInstance }),
         notificationAPI: new notificationAPI({}),
-        mailAPI: new mailAPI({ mailerQueueInstance })
+        mailAPI: new mailAPI({ mailerQueueInstance }),
+        smappeeAPI: new smappeeAPI({}),
     })
 });
 

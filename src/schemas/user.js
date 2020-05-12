@@ -79,6 +79,7 @@ const typeDefs = gql`
         location: JSON
         metaData: JSON
         profilePicture: String
+        serviceLocations: JSON
         loginCounter: Int
         resetToken: String
     }

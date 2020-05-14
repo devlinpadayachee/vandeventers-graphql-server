@@ -148,7 +148,7 @@ module.exports.createMongoInstance = async () => {
     const adminUser = await User.create({
       username: 'admin',
       password,
-      firstName: 'teebox',
+      firstName: 'nuhome',
       lastName: 'admin',
       fullAddress: '1 Sjampanje Street, Wilgeheuwel',
       email: APP_DEFAULT_ADMIN_EMAIL,
@@ -330,7 +330,7 @@ return `<!doctype html>
   <html>
     <head>
         <meta charset="utf-8">
-        <title>OnlineTeeBox Message</title>
+        <title>Nuhome Message</title>
         
         <style>
         .message-box {
@@ -464,7 +464,7 @@ return `<!doctype html>
                         <table>
                             <tr>
                                 <td>
-                                  You can get back to me at <a href="${process.env.APP_CLIENT_URL}">OnlineTeeBox</a><br> 
+                                  You can get back to me at <a href="${process.env.APP_CLIENT_URL}">Nuhome</a><br> 
                                   or contact me directly at ${fromUser.email}
                                 </td>
                             </tr>

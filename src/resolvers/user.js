@@ -64,7 +64,7 @@ module.exports = {
             const fromUser = await context.dataSources.mongoAPI.user(args.from);
             if (!toUser || !fromUser) throw new UserInputError('Could not find one of the users specified!');
             const populatedTemplate  = await getUserToUserMailTemplate(toUser, fromUser, args.message);
-            var job = context.dataSources.mailAPI.sendMail(toUser.email, `OnlineTeeBox Message From ${fromUser.firstName} ${fromUser.lastName}`, populatedTemplate);
+            var job = context.dataSources.mailAPI.sendMail(toUser.email, `Nuhome Message From ${fromUser.firstName} ${fromUser.lastName}`, populatedTemplate);
             if (job) return job;
             throw new ApolloError('Could not generate user to user message mailer', 'ACTION_NOT_COMPLETED', {});
         },

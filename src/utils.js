@@ -9,6 +9,7 @@ const moment =  require('moment');
 const _ =  require('lodash');
 const { Schema } = mongoose;
 var Queue = require('bull');
+var soap = require('soap');
 var firebaseAdmin = require('firebase-admin');
 var firebaseServiceAccount = require('../firebase-service-account.json');
 
@@ -58,6 +59,8 @@ module.exports.createMongoInstance = async () => {
     password: {type: String, required: true},
     firstName: {type: String, required: true},
     lastName: {type: String, required: true},
+    idNumber: {type: String, required: true},
+    validCreditRating: {type: Boolean, default: false},
     fullAddress: {type: String, required: true},
     telNumber: {type: String},
     rating: Number,
@@ -150,6 +153,8 @@ module.exports.createMongoInstance = async () => {
       password,
       firstName: 'nuhome',
       lastName: 'admin',
+      idNumber: '8512315344083',
+      validCreditRating: true,
       fullAddress: '1 Sjampanje Street, Wilgeheuwel',
       email: APP_DEFAULT_ADMIN_EMAIL,
       role: 'admin'
@@ -247,6 +252,29 @@ module.exports.createMailerQueueInstance = async () => {
     else {
       console.log(`Failed to connect to Redis mailer queue on ${process.env.APP_MAILER_QUEUE_REDIS_URL || '127.0.0.1'}`);
     }
+  }
+};
+
+module.exports.createTransunionInstance = async () => {
+  console.log('Connecting to TransUnion...');
+  var url = 'https://securetest.transunion.co.za/TUBureau118/Consumer.asmx?WSDL';
+  // soap.createClientAsync(url, function(error, client) {
+  //   if (error) {
+  //     console.log('Could not create Transunion client');
+  //   }
+  //   console.log('Transunion client created');
+  //   return { client }
+  // });
+  try {
+    const client = await soap.createClientAsync(url);
+    if (client) {
+      console.log('Transunion client created');
+      return { client };
+    } else {
+      console.log('Could not create Transunion client');
+    }
+  } catch (error) {
+    console.log('Could not create Transunion client');
   }
 };
 

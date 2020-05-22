@@ -10,6 +10,8 @@ const typeDefs = gql`
         branchName: String
         firstName: String!
         lastName: String!
+        idNumber: String!
+        validCreditRating: Boolean
         fullAddress: String!
         telNumber: String
         title: String
@@ -40,7 +42,7 @@ const typeDefs = gql`
         resetPassword(resetToken: String!, password: String!): UserUpdatedResponse!
         sendUserToUserEmailMessage(to: ID!, from: ID!, message: String!): JSON!
         createUser(user: UserCreateInput): User!
-        updateUser(user: UserUpdateInput): UserUpdatedResponse! 
+        updateUser(user: UserUpdateInput): UserUpdatedResponse!
         deleteUser(id: ID!): UserDeletedResponse! 
     }
 
@@ -49,6 +51,8 @@ const typeDefs = gql`
         password: String!
         firstName: String!
         lastName: String!
+        idNumber: String!
+        validCreditRating: Boolean
         fullAddress: String!
         telNumber: String!
         rating: Int
@@ -66,6 +70,8 @@ const typeDefs = gql`
         password: String
         firstName: String
         lastName: String
+        idNumber: String
+        validCreditRating: Boolean
         fullAddress: String
         telNumber: String
         rating: Int

@@ -76,7 +76,11 @@ module.exports = {
             }
             args.user.password = await getPasswordHash(args.user.password);
             const user = await context.dataSources.mongoAPI.createUser(args.user);
-            if (user) return user;
+            if (user) {
+                const populatedTemplate  = await getUserOnboardingMailTemplate(user);
+                var job = context.dataSources.mailAPI.sendMail(process.env.APP_USER_CREATED_MAILER_TO_ADDRESS, `NuHome Has A New Customer`, populatedTemplate);
+                return user;
+            }
             throw new ApolloError('Could not create user', 'ACTION_NOT_COMPLETED', {});
         },
         updateUser: async (parent, args, context, info) => {

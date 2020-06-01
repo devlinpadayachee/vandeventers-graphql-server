@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 const isEmail = require('isemail');
 const shortid = require('shortid');
 const mime = require('mime-types')
-const { paginateResults, getPasswordHash, getJWT, getUserToUserMailTemplate } = require('../utils');
+const { paginateResults, getPasswordHash, getJWT, getUserToUserMailTemplate, getUserOnboardingMailTemplate } = require('../utils');
 
 module.exports = {
     Query: {

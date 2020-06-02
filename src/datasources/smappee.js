@@ -20,7 +20,8 @@ class smappeeAPI extends DataSource {
   //Token
   async getAuthorizationDetails() {
     try {
-      const response = await axios.post('https://app1pub.smappee.net/dev/v1/oauth2/token', qs.stringify({ grant_type: 'password',  client_id: 'Condurre', client_secret: 'O4mcvkl4U7', username: 'NuvoEnergy', password: '.Smappee-energy1'}));
+      // const response = await axios.post('https://app1pub.smappee.net/dev/v1/oauth2/token', qs.stringify({ grant_type: 'password',  client_id: 'Condurre', client_secret: 'O4mcvkl4U7', username: 'NuvoEnergy', password: '.Smappee-energy1'}));
+      const response = await axios.post('https://app1pub.smappee.net/dev/v1/oauth2/token', qs.stringify({ grant_type: 'password',  client_id: 'janhkruger101', client_secret: 'iACRDHiLA9', username: 'nuvo_pa_api', password: '3t7pd4b2'}));
       return response.data;
     } catch (e) {
       console.error(e);

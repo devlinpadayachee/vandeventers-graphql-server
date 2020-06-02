@@ -26,6 +26,8 @@ const typeDefs = gql`
         serviceLocations: JSON
         loginCounter: Int
         resetToken: String
+        documents: String
+        estimatedMonthly: String
         createdAt: Float!
         updatedAt: Float!
     }
@@ -63,6 +65,8 @@ const typeDefs = gql`
         industry: String
         role: Role!
         branch: ID
+        documents: String
+        estimatedMonthly: String
     }
 
     input UserUpdateInput {

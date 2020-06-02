@@ -68,6 +68,11 @@ module.exports = {
             if (job) return job;
             throw new ApolloError('Could not generate user to user message mailer', 'ACTION_NOT_COMPLETED', {});
         },
+        sendOTP: async (parent, args, context, info) => {
+            const sendOTPResponse = await context.dataSources.notificationAPI.sendSMS(args.recipient, args.message);
+            if (!sendOTPResponse) throw new ApolloError('Could not send OTP', 'ACTION_NOT_COMPLETED', {});
+            return sendOTPResponse;
+        },
         createUser: async (parent, args, context, info) => {
             if (!isEmail.validate(args.user.email)) {
                 throw new UserInputError('Email is invalid', {

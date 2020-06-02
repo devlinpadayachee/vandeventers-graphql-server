@@ -5,6 +5,8 @@ const {
 } = require('apollo-server-express');
 const { DataSource } = require('apollo-datasource');
 const { Expo } = require('expo-server-sdk');
+const axios = require('axios');
+const qs = require('qs');
 class notificationAPI extends DataSource {
   constructor({}) {
     super();
@@ -46,6 +48,14 @@ class notificationAPI extends DataSource {
         }
       })();
       return tickets;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  async sendSMS(recipient, message) {
+    try {
+      const response = await axios.post('http://144.91.64.120:9010/api/sms/simplified', { text: message, sender: 'NuHome', recipient: recipient});
+      return response.data;
     } catch (e) {
       console.error(e);
     }

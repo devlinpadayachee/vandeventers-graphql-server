@@ -79,14 +79,6 @@ module.exports = {
                     invalidArgs: ['email'],
                 });
             }
-            if (args?.user?.documents){
-                console.log('Attempting to get fileUrl for Documents from FireBase');
-                let mimeType = args?.user?.documents.match(/[^:]\w+\/[\w-+\d.]+(?=;|,)/)[0];
-                console.log('Got MimeType', mimeType);
-                const fileUrl = await context.dataSources.firebaseAPI.uploadFile('zip', `documents/${args.user.username}`, { working: true }, mimeType, args?.user?.documents);
-                console.log(fileUrl)
-                args.user.documents = fileUrl;
-            }
             args.user.password = await getPasswordHash(args.user.password);
             const user = await context.dataSources.mongoAPI.createUser(args.user);
             if (user) {

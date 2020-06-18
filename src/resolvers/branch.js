@@ -11,6 +11,7 @@ module.exports = {
             return branch;
         },
         branches: async (parent, args, context, info) => {
+            console.log('Got a query for branches');
             const branches = await context.dataSources.mongoAPI.branches(args.limit, args.skip, args.query);
             return branches;
         }

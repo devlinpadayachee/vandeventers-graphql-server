@@ -14,8 +14,6 @@ const PostTypeDef = require ('./schemas/post');
 const NotificationTypeDef = require ('./schemas/notification');
 const ReasonTypeDef = require ('./schemas/reason');
 const AttachmentTypeDef = require ('./schemas/attachment');
-const SmappeeTypeDef = require ('./schemas/smappee');
-const TransunionTypeDef = require ('./schemas/transunion');
 const BaseResolver = require('./resolvers/base');
 const UserResolver = require('./resolvers/user');
 const BranchResolver = require('./resolvers/branch');
@@ -23,35 +21,29 @@ const PostResolver = require('./resolvers/post');
 const NotificationResolver = require('./resolvers/notification');
 const ReasonResolver = require('./resolvers/reason');
 const AttachmentResolver = require('./resolvers/attachment');
-const SmappeeResolver = require ('./resolvers/smappee');
-const TransunionResolver = require ('./resolvers/transunion');
 const permissions = require('./permissions');
 
-const { createMongoInstance, createFirebaseInstance, createMailerQueueInstance, createTransunionInstance, getArenaConfig, verifyToken } = require('./utils');
+const { createMongoInstance, createFirebaseInstance, createMailerQueueInstance, getArenaConfig, verifyToken } = require('./utils');
 
 const _ = require('lodash');
 const mongoAPI = require('./datasources/mongo');
 const firebaseAPI = require('./datasources/firebase');
 const notificationAPI = require('./datasources/notification');
 const mailAPI = require('./datasources/mail');
-const smappeeAPI = require('./datasources/smappee');
-const transunionAPI = require('./datasources/transunion');
 
 var mongoInstance;
 var firebaseInstance;
 var mailerQueueInstance;
-var transunionInstance;
 (async() => {
     mongoInstance = await createMongoInstance();
     firebaseInstance = await createFirebaseInstance();
-    mailerQueueInstance = await createMailerQueueInstance();
-    transunionInstance = await createTransunionInstance();
+    mailerQueueInstance = await createMailerQueueInstance();;
 })();
 
 const schema = applyMiddleware(
     makeExecutableSchema({
-        typeDefs: [ BaseTypeDef, UserTypeDef, BranchTypeDef, PostTypeDef, NotificationTypeDef, ReasonTypeDef, AttachmentTypeDef, SmappeeTypeDef, TransunionTypeDef ],
-        resolvers: _.merge( BaseResolver, UserResolver, BranchResolver, PostResolver, NotificationResolver, ReasonResolver, AttachmentResolver, SmappeeResolver, TransunionResolver )
+        typeDefs: [ BaseTypeDef, UserTypeDef, BranchTypeDef, PostTypeDef, NotificationTypeDef, ReasonTypeDef, AttachmentTypeDef ],
+        resolvers: _.merge( BaseResolver, UserResolver, BranchResolver, PostResolver, NotificationResolver, ReasonResolver, AttachmentResolver )
     }),
     permissions
 );
@@ -74,9 +66,7 @@ const server = new ApolloServer({
         mongoAPI: new mongoAPI({ mongoInstance }),
         firebaseAPI: new firebaseAPI({ firebaseInstance }),
         notificationAPI: new notificationAPI({}),
-        mailAPI: new mailAPI({ mailerQueueInstance }),
-        smappeeAPI: new smappeeAPI({}),
-        transunionAPI: new transunionAPI({ transunionInstance }),
+        mailAPI: new mailAPI({ mailerQueueInstance })
     })
 });
 

@@ -4,14 +4,12 @@ const typeDefs = gql`
 
     type User {
         id: ID!
-        username: String!
         email: String!
         branch: ID
         branchName: String
         firstName: String!
         lastName: String!
         idNumber: String!
-        validCreditRating: Boolean
         fullAddress: String!
         telNumber: String
         title: String
@@ -23,11 +21,8 @@ const typeDefs = gql`
         location: JSON
         metaData: JSON
         profilePicture: String
-        serviceLocations: JSON
         loginCounter: Int
         resetToken: String
-        documents: String
-        estimatedMonthly: String
         createdAt: Float!
         updatedAt: Float!
     }
@@ -50,12 +45,10 @@ const typeDefs = gql`
     }
 
     input UserCreateInput {
-        username: String!
         password: String!
         firstName: String!
         lastName: String!
         idNumber: String!
-        validCreditRating: Boolean
         fullAddress: String!
         telNumber: String!
         rating: Int
@@ -65,18 +58,14 @@ const typeDefs = gql`
         industry: String
         role: Role!
         branch: ID
-        documents: String
-        estimatedMonthly: String
     }
 
     input UserUpdateInput {
         id: ID!
-        username: String
         password: String
         firstName: String
         lastName: String
         idNumber: String
-        validCreditRating: Boolean
         fullAddress: String
         telNumber: String
         rating: Int
@@ -90,7 +79,6 @@ const typeDefs = gql`
         location: JSON
         metaData: JSON
         profilePicture: String
-        serviceLocations: JSON
         loginCounter: Int
         resetToken: String
     }

@@ -33,7 +33,7 @@ class transunionAPI extends DataSource {
           IdentityNo1: idNumber,
           Forename1: firstName,
           Surname: lastName,
-          EnquirerContactName: "NuHome",
+          EnquirerContactName: "Lenco",
           EnquirerContactPhoneNo: "0745770050",
         }
       })

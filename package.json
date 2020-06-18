@@ -1,5 +1,5 @@
 {
-  "name": "nuhome-graphql-server",
+  "name": "lenco-graphql-server",
   "version": "1.0.0",
   "engines": {
     "node": "14.1.x"

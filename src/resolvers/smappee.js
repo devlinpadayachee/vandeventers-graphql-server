@@ -33,7 +33,7 @@ module.exports = {
             if (!user) throw new AuthenticationError('Could not find user!');
             const serviceLocationCostAnalysis = await context.dataSources.smappeeAPI.serviceLocationCostAnalysis(args.serviceLocationId, args.aggregation, args.from, args.to );
             const populatedTemplate = await getHTMLBill(user, serviceLocationCostAnalysis);
-            var job = context.dataSources.mailAPI.sendMail(args.email, 'Nuhome Monthly Bill', populatedTemplate);
+            var job = context.dataSources.mailAPI.sendMail(args.email, 'Lenco Monthly Bill', populatedTemplate);
             if (job) return job;
             throw new ApolloError('Could not generate password reset link mailer', 'ACTION_NOT_COMPLETED', {})
         },

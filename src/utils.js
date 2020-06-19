@@ -104,6 +104,8 @@ module.exports.createMongoInstance = async () => {
     title: {type: String, required: true},
     content: {type: String, required: true},
     user: {type: Schema.Types.ObjectId, required: true},
+    assignee: {type: Schema.Types.ObjectId, required: true},
+    status: {type: String, required: true, enum: ['open', 'declined','closed','resolved']},
     reason: {type: Schema.Types.ObjectId},
     comment: {type: String},
     createdBy: {type: Schema.Types.ObjectId, required: true},

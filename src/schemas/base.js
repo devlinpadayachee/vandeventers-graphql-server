@@ -17,7 +17,15 @@ const typeDefs = gql`
 
     enum Role {
         admin
+        consultant
         user
+    }
+
+    enum Status {
+        open
+        declined
+        closed
+        resolved
     }
 
     enum AttachmentType {

@@ -8,6 +8,7 @@ const typeDefs = gql`
         content: String!
         user: ID!
         assignee: ID
+        status: Status!
         reason: ID
         comment: String
         createdBy: ID!
@@ -35,6 +36,7 @@ const typeDefs = gql`
         title: String!
         content: String!
         user: ID!
+        status: Status!
         createdBy: ID!
     }
 
@@ -43,6 +45,7 @@ const typeDefs = gql`
         title: String
         content: String
         assignee: ID
+        status: Status
         reason: ID
         comment: String
     }

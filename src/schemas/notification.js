@@ -7,6 +7,7 @@ const typeDefs = gql`
         title: String!
         content: String!
         user: ID!
+        assignee: ID
         reason: ID
         comment: String
         createdBy: ID!
@@ -41,6 +42,7 @@ const typeDefs = gql`
         id: ID!
         title: String
         content: String
+        assignee: ID
         reason: ID
         comment: String
     }

@@ -606,7 +606,7 @@ module.exports.getUserOnboardingMailTemplate = (user) => {
                           <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Login to the Lenco Admin Portal to view the customer</p>
                           <tbody>
                                   <tr>
-                                      <td style="font-family: sans-serif; font-size: 14px;text-align: center; vertical-align: top; background-color: #01B0f1; border-radius: 5px; text-align: center;"> <a href="https://lenco-graphql-client.herokuapp.com/#/" target="_blank" style="display: inline-block; color: #ffffff; background-color: #01B0f1; border: solid 1px #01B0f1; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #01B0f1;">Take me to the Lenco Admin Portal</a> </td>
+                                      <td style="font-family: sans-serif; font-size: 14px;text-align: center; vertical-align: top; background-color: #000000; border-radius: 5px; text-align: center;"> <a href="https://lenco-graphql-client.herokuapp.com/#/" target="_blank" style="display: inline-block; color: #ffffff; background-color: #000000; border: solid 1px #000000; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #000000;">Take me to the Lenco Admin Portal</a> </td>
                                   </tr>
                                   
                               </tbody>

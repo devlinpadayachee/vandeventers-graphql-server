@@ -11,7 +11,7 @@ module.exports = {
             return notification;
         },
         notifications: async (parent, args, context, info) => {
-            console.log('Getting notifications');
+            console.log('Getting notifications', args);
             const notifications = await context.dataSources.mongoAPI.notifications(args.limit, args.skip, args.query);
             return notifications;
         }
@@ -25,7 +25,7 @@ module.exports = {
                 to: pushToken, 
                 sound: 'default',
                 title: args.notification.title,
-                body: args.notification.content,
+                body: 'A new ticket has been logged!',
                 data: {
                     notification
                 },

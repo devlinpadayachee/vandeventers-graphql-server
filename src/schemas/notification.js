@@ -36,6 +36,7 @@ const typeDefs = gql`
     input NotificationCreateInput {
         title: String!
         content: String!
+        diagnostic: JSON
         user: ID!
         status: Status!
         createdBy: ID!

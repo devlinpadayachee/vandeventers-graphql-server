@@ -57,7 +57,7 @@ module.exports.createMongoInstance = async () => {
   const userSchema = new Schema({
     firstName: {type: String, required: true},
     lastName: {type: String, required: true},
-    idNumber: {type: String, required: true},
+    idNumber: {type: String},
     password: {type: String, required: true},
     fullAddress: {type: String, required: true},
     telNumber: {type: String},

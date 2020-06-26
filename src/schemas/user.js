@@ -9,7 +9,7 @@ const typeDefs = gql`
         branchName: String
         firstName: String!
         lastName: String!
-        idNumber: String!
+        idNumber: String
         fullAddress: String!
         telNumber: String
         title: String
@@ -48,7 +48,7 @@ const typeDefs = gql`
         password: String!
         firstName: String!
         lastName: String!
-        idNumber: String!
+        idNumber: String
         fullAddress: String!
         telNumber: String!
         rating: Int

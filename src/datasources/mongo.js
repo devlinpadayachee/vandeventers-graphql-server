@@ -38,7 +38,7 @@ class mongoAPI extends DataSource {
       if (skip >= count) {
         skip = 0;
       }
-      const records = await this.User.find(query).limit(limit).skip(skip);
+      const records = await this.User.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
       return records.length > 0 ? { records, count } : { records : [], count: 0 };
     } catch(e){
       console.log('Oops Something went wrong');
@@ -173,7 +173,7 @@ class mongoAPI extends DataSource {
       if (skip >= count) {
         skip = 0;
       }
-      const records = await this.Post.find(query).limit(limit).skip(skip);
+      const records = await this.Post.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
       return records.length > 0 ? { records, count } : { records : [], count: 0 };
     } catch(e){
       console.log('Oops Something went wrong');
@@ -229,7 +229,7 @@ class mongoAPI extends DataSource {
       if (skip >= count) {
         skip = 0;
       }
-      const records = await this.Notification.find(query).limit(limit).skip(skip);
+      const records = await this.Notification.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
       return records.length > 0 ? { records, count } : { records : [], count: 0 };
     } catch(e){
       console.log('Oops Something went wrong');

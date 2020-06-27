@@ -25,9 +25,10 @@ module.exports = {
             var pushToken = user.pushToken;
             if (args?.notification?.images && args?.notification?.images.length > 0){
                 console.log('Attempting to get fileUrl from FireBase for notification images');
-                var firebaseImageItems = await Promise.all(args.notification.images.map(async (image) => {
+                var firebaseImageItems = await Promise.all(args.notification.images.map(async (image, index) => {
                     let mimeType = image.match(/[^:]\w+\/[\w-+\d.]+(?=;|,)/)[0];
-                    const fileUrl = await context.dataSources.firebaseAPI.uploadFile(mime.extension(mimeType), `notification-images/${args.notification.title}`, { working: true }, mimeType, image);
+                    console.log(mimType);
+                    const fileUrl = await context.dataSources.firebaseAPI.uploadFile(mime.extension(mimeType), `notification-images/${args.notification.title}_${index}`, { working: true }, mimeType, image);
                     console.log(fileUrl)
                     return fileUrl;
                 }));

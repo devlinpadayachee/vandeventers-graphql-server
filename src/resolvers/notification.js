@@ -67,6 +67,11 @@ module.exports = {
             const user = await context.dataSources.mongoAPI.user(parent.user);
             if (!user) return null;
             return `${user.firstName} ${user.lastName}`;
+        },
+        assigneeFullName: async (parent, args, context, info) => {
+            const user = await context.dataSources.mongoAPI.user(parent.assignee);
+            if (!user) return null;
+            return `${user.firstName} ${user.lastName}`;
         }
     }
 };

@@ -4,6 +4,9 @@ const {
     ApolloError
 } = require('apollo-server-express');
 
+const shortid = require('shortid');
+const mime = require('mime-types')
+
 module.exports = {
     Query: {
         notification: async (parent, args, context, info) => {

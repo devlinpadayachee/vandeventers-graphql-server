@@ -109,6 +109,7 @@ module.exports.createMongoInstance = async () => {
     reason: {type: Schema.Types.ObjectId},
     comment: {type: String},
     diagnostic: {type: Object},
+    images: {type: Array},
     createdBy: {type: Schema.Types.ObjectId, required: true},
     createdAt: Number,
     updatedAt: Number,

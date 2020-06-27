@@ -62,4 +62,11 @@ module.exports = {
             throw new ApolloError('Could not delete notification', 'ACTION_NOT_COMPLETED', {});
         },
     },
+    Notification: {
+        userFullName: async (parent, args, context, info) => {
+            const user = await context.dataSources.mongoAPI.user(parent.user);
+            if (!user) return null;
+            return `${user.firstName} ${user.lastName}`;
+        }
+    }
 };

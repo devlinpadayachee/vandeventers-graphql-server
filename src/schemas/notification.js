@@ -7,6 +7,7 @@ const typeDefs = gql`
         title: String!
         content: String!
         user: ID!
+        userFullName: String
         assignee: ID
         status: Status!
         reason: ID

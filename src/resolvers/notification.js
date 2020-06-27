@@ -31,7 +31,7 @@ module.exports = {
                     if (mimeType === 'image/jpg') {
                         mimeType = 'image/jpeg';
                     }
-                    const fileUrl = await context.dataSources.firebaseAPI.uploadFile(mime.extension(mimeType), `notification-images/${args.notification.title}_${index}`, { working: true }, mimeType, image);
+                    const fileUrl = await context.dataSources.firebaseAPI.uploadFile(mime.extension(mimeType), `notification-pictures/${args.notification.title}/${index}`, { working: true }, mimeType, image);
                     console.log(fileUrl)
                     return fileUrl;
                 }));

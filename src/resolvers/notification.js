@@ -27,7 +27,7 @@ module.exports = {
                 console.log('Attempting to get fileUrl from FireBase for notification images');
                 var firebaseImageItems = await Promise.all(args.notification.images.map(async (image, index) => {
                     let mimeType = image.match(/[^:]\w+\/[\w-+\d.]+(?=;|,)/)[0];
-                    console.log(mimType);
+                    console.log(mimeType);
                     const fileUrl = await context.dataSources.firebaseAPI.uploadFile(mime.extension(mimeType), `notification-images/${args.notification.title}_${index}`, { working: true }, mimeType, image);
                     console.log(fileUrl)
                     return fileUrl;

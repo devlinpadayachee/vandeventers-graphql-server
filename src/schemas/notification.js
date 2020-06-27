@@ -12,6 +12,7 @@ const typeDefs = gql`
         reason: ID
         comment: String
         diagnostic: JSON
+        images: JSON
         createdBy: ID!
         createdAt: Float!
         updatedAt: Float!
@@ -37,6 +38,7 @@ const typeDefs = gql`
         title: String!
         content: String!
         diagnostic: JSON
+        images: JSON
         user: ID!
         status: Status!
         createdBy: ID!
@@ -51,6 +53,7 @@ const typeDefs = gql`
         reason: ID
         comment: String
         diagnostic: JSON
+        images: JSON
     }
 
     type NotificationUpdatedResponse {

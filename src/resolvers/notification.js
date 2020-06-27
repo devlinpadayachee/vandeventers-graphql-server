@@ -20,6 +20,16 @@ module.exports = {
         createNotification: async (parent, args, context, info) => {
             var user = await context.dataSources.mongoAPI.user(args.notification.user);
             var pushToken = user.pushToken;
+            if (args?.notification?.images && args?.notification?.images.length > 0){
+                console.log('Attempting to get fileUrl from FireBase for notification images');
+                var firebaseImageItems = await Promise.all(args.notification.images.map(async (image) => {
+                    let mimeType = image.match(/[^:]\w+\/[\w-+\d.]+(?=;|,)/)[0];
+                    const fileUrl = await context.dataSources.firebaseAPI.uploadFile(mime.extension(mimeType), `notification-images/${args.notification.title}`, { working: true }, mimeType, image);
+                    console.log(fileUrl)
+                    return fileUrl;
+                }));
+                args.notification.images = firebaseImageItems;
+            }
             const notification = await context.dataSources.mongoAPI.createNotification(args.notification);
             var ticket = await context.dataSources.notificationAPI.sendMessages([{
                 to: pushToken, 

@@ -135,6 +135,17 @@ module.exports.createMongoInstance = async () => {
   },{
     timestamps: { currentTime: () => Date.now() }
   });
+
+  const productSchema = new Schema({
+    title: {type: String, required: true},
+    content: {type: String, required: true},
+    featurePicture: {type: String},
+    createdBy: {type: Schema.Types.ObjectId, required: true},
+    createdAt: Number,
+    updatedAt: Number,
+  },{
+    timestamps: { currentTime: () => Date.now() }
+  });
   
   const User = mongoose.model('User', userSchema);
   const Post = mongoose.model('Post', postSchema);
@@ -142,6 +153,7 @@ module.exports.createMongoInstance = async () => {
   const Branch = mongoose.model('Branch', branchSchema);
   const Reason = mongoose.model('Reason', reasonSchema);
   const Attachment = mongoose.model('Attachment', attachmentSchema);
+  const Product = mongoose.model('Product', productSchema);
  
   const APP_DEFAULT_ADMIN_EMAIL = process.env.APP_DEFAULT_ADMIN_EMAIL || 'devlinpadayachee@gmail.com';
   const APP_DEFAULT_ADMIN_PASSWORD= process.env.APP_DEFAULT_ADMIN_PASSWORD || 'Sepiroth6043@';
@@ -166,7 +178,7 @@ module.exports.createMongoInstance = async () => {
   } else {
     console.log('Skipped admin creation')
   }
-  return { User, Post, Notification, Reason, Branch, Attachment };
+  return { User, Post, Notification, Reason, Branch, Attachment, Product };
 };
 
 module.exports.createFirebaseInstance = async () => {

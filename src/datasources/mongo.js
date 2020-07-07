@@ -15,6 +15,7 @@ class mongoAPI extends DataSource {
     this.Notification = mongoInstance.Notification;
     this.Reason = mongoInstance.Reason;
     this.Attachment = mongoInstance.Attachment;
+    this.Product = mongoInstance.Product;
   }
   
   initialize(config) {
@@ -41,7 +42,7 @@ class mongoAPI extends DataSource {
       const records = await this.User.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
       return records.length > 0 ? { records, count } : { records : [], count: 0 };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -51,7 +52,7 @@ class mongoAPI extends DataSource {
       const user = await this.User.create(args);
       return user ? user : null;
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -62,7 +63,7 @@ class mongoAPI extends DataSource {
       const updatedUser = await this.User.findOneAndUpdate({ _id: id }, args, { new: true } );
       return updatedUser ? { id, updated: true, user: updatedUser } : { id, updated: false, user: null };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -72,7 +73,7 @@ class mongoAPI extends DataSource {
       const deletedUser = await this.User.deleteOne({ _id: id });
       return deletedUser.deletedCount > 0 ? { id, deleted: true, user: deletedUser  } : { id, deleted: false, user: null };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -120,7 +121,7 @@ class mongoAPI extends DataSource {
       const records = await this.Branch.find(query).limit(limit).skip(skip);
       return records.length > 0 ? { records, count } : { records : [], count: 0 };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -130,7 +131,7 @@ class mongoAPI extends DataSource {
       const branch = await this.Branch.create(args);
       return branch ? branch : null;
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -141,7 +142,7 @@ class mongoAPI extends DataSource {
       const updatedBranch = await this.Branch.findOneAndUpdate({ _id: id }, args, { new: true } );
       return updatedBranch ? { id, updated: true, branch: updatedBranch } : { id, updated: false, branch: null };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -151,7 +152,7 @@ class mongoAPI extends DataSource {
       const deletedBranch = await this.Branch.deleteOne({ _id: id });
       return deletedBranch.deletedCount > 0 ? { id, deleted: true, branch: deletedBranch } : { id, deleted: false, branch: null };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -176,7 +177,7 @@ class mongoAPI extends DataSource {
       const records = await this.Post.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
       return records.length > 0 ? { records, count } : { records : [], count: 0 };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -186,7 +187,7 @@ class mongoAPI extends DataSource {
       const post = await this.Post.create(args);
       return post ? post : null;
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -197,7 +198,7 @@ class mongoAPI extends DataSource {
       const updatedPost = await this.Post.findOneAndUpdate({ _id: id }, args, { new: true } );
       return updatedPost ? { id, updated: true, post: updatedPost } : { id, updated: false, post: null };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -207,7 +208,7 @@ class mongoAPI extends DataSource {
       const deletedPost = await this.Post.deleteOne({ _id: id });
       return deletedPost.deletedCount > 0 ? { id, deleted: true, post: deletedPost } : { id, deleted: false, post: null };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -232,7 +233,7 @@ class mongoAPI extends DataSource {
       const records = await this.Notification.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
       return records.length > 0 ? { records, count } : { records : [], count: 0 };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -242,7 +243,7 @@ class mongoAPI extends DataSource {
       const notification = await this.Notification.create(args);
       return notification ? notification : null;
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -253,7 +254,7 @@ class mongoAPI extends DataSource {
       const updatedNotification = await this.Notification.findOneAndUpdate({ _id: id }, args, { new: true } );
       return updatedNotification ? { id, updated: true, notification: updatedNotification } : { id, updated: false, notification: null};
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -263,7 +264,7 @@ class mongoAPI extends DataSource {
       const deletedNotification = await this.Notification.deleteOne({ _id: id });
       return deletedNotification.deletedCount > 0 ? { id, deleted: true, notification: deletedNotification } : { id, deleted: false, notification: null };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -288,7 +289,7 @@ class mongoAPI extends DataSource {
       const records = await this.Reason.find(query).limit(limit).skip(skip);
       return records.length > 0 ? { records, count } : { records : [], count: 0 };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -298,7 +299,7 @@ class mongoAPI extends DataSource {
       const reason = await this.Reason.create(args);
       return reason ? reason : null;
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -309,7 +310,7 @@ class mongoAPI extends DataSource {
       const updatedReason = await this.Reason.findOneAndUpdate({ _id: id }, args, { new: true } );
       return updatedReason ? { id, updated: true, reason: updatedReason } : { id, updated: false, reason: null };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -319,7 +320,7 @@ class mongoAPI extends DataSource {
       const deletedReason = await this.Reason.deleteOne({ _id: id });
       return deletedReason.deletedCount > 0 ? { id, deleted: true, reason: deletedReason } : { id, deleted: false, reason: null };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -345,7 +346,7 @@ class mongoAPI extends DataSource {
       const records = await this.Attachment.find(query).limit(limit).skip(skip);
       return records.length > 0 ? { records, count } : { records : [], count: 0 };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -355,7 +356,7 @@ class mongoAPI extends DataSource {
       const attachment = await this.Attachment.create(args);
       return attachment ? attachment : null;
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -366,7 +367,7 @@ class mongoAPI extends DataSource {
       const updatedAttachment = await this.Attachment.findOneAndUpdate({ _id: id }, args, { new: true } );
       return updatedAttachment ? { id, updated: true, attachment: updatedAttachment  } : { id, updated: false, attachment: null  };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
@@ -376,7 +377,63 @@ class mongoAPI extends DataSource {
       const deletedAttachment = await this.Attachment.deleteOne({ _id: id });
       return deletedAttachment.deletedCount > 0 ? { id, deleted: true, attachment: deletedAttachment } : { id, deleted: false, attachment: null };
     } catch(e){
-      console.log('Oops Something went wrong');
+      console.log('Oops Something went wrong', e);
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  //Products
+  async product(id) {
+    try {
+      const product = await this.Product.findOne({ _id: id });
+      return product ? product : null;
+    } catch(e){
+      console.log('Oops Something went wrong with finding the product');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async products(limit = 10, skip = 0, query = {}) {
+    try {
+      const count = await this.Product.where(query).countDocuments();
+      if (skip >= count) {
+        skip = 0;
+      }
+      const records = await this.Product.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
+      return records.length > 0 ? { records, count } : { records : [], count: 0 };
+    } catch(e){
+      console.log('Oops Something went wrong', e);
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async createProduct(args) {
+    try {
+      const product = await this.Product.create(args);
+      return product ? product : null;
+    } catch(e){
+      console.log('Oops Something went wrong', e);
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async updateProduct(args) {
+    try {
+      const id = args.id
+      const updatedProduct = await this.Product.findOneAndUpdate({ _id: id }, args, { new: true } );
+      return updatedProduct ? { id, updated: true, product: updatedProduct } : { id, updated: false, product: null };
+    } catch(e){
+      console.log('Oops Something went wrong', e);
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async deleteProduct(id) {
+    try {
+      const deletedProduct = await this.Product.deleteOne({ _id: id });
+      return deletedProduct.deletedCount > 0 ? { id, deleted: true, product: deletedProduct } : { id, deleted: false, product: null };
+    } catch(e){
+      console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }

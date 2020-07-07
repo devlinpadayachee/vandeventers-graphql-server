@@ -14,6 +14,7 @@ const PostTypeDef = require ('./schemas/post');
 const NotificationTypeDef = require ('./schemas/notification');
 const ReasonTypeDef = require ('./schemas/reason');
 const AttachmentTypeDef = require ('./schemas/attachment');
+const ProductTypeDef = require ('./schemas/product');
 const BaseResolver = require('./resolvers/base');
 const UserResolver = require('./resolvers/user');
 const BranchResolver = require('./resolvers/branch');
@@ -21,6 +22,7 @@ const PostResolver = require('./resolvers/post');
 const NotificationResolver = require('./resolvers/notification');
 const ReasonResolver = require('./resolvers/reason');
 const AttachmentResolver = require('./resolvers/attachment');
+const ProductResolver = require('./resolvers/product');
 const permissions = require('./permissions');
 
 const { createMongoInstance, createFirebaseInstance, createMailerQueueInstance, getArenaConfig, verifyToken } = require('./utils');
@@ -42,8 +44,8 @@ var mailerQueueInstance;
 
 const schema = applyMiddleware(
     makeExecutableSchema({
-        typeDefs: [ BaseTypeDef, UserTypeDef, BranchTypeDef, PostTypeDef, NotificationTypeDef, ReasonTypeDef, AttachmentTypeDef ],
-        resolvers: _.merge( BaseResolver, UserResolver, BranchResolver, PostResolver, NotificationResolver, ReasonResolver, AttachmentResolver )
+        typeDefs: [ BaseTypeDef, UserTypeDef, BranchTypeDef, PostTypeDef, NotificationTypeDef, ReasonTypeDef, AttachmentTypeDef, ProductTypeDef ],
+        resolvers: _.merge( BaseResolver, UserResolver, BranchResolver, PostResolver, NotificationResolver, ReasonResolver, AttachmentResolver, ProductResolver )
     }),
     permissions
 );

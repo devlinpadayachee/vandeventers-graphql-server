@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 const isEmail = require('isemail');
 const shortid = require('shortid');
 const mime = require('mime-types')
-const { paginateResults, getPasswordHash, getJWT, getUserToUserMailTemplate, getUserOnboardingMailTemplate } = require('../utils');
+const { paginateResults, getPasswordHash, getJWT, getUserToUserMailTemplate, getUserOnboardingMailTemplate, getShopEnquiryTemplate } = require('../utils');
 
 module.exports = {
     Query: {
@@ -72,6 +72,14 @@ module.exports = {
             const sendOTPResponse = await context.dataSources.notificationAPI.sendSMS(args.recipient, args.message);
             if (!sendOTPResponse) throw new ApolloError('Could not send OTP', 'ACTION_NOT_COMPLETED', {});
             return sendOTPResponse;
+        },
+        sendShopEnquiry: async (parent, args, context, info) => {
+            const fromUser = await context.dataSources.mongoAPI.user(args.from);
+            if (!fromUser) throw new UserInputError('Could not find user specified!');
+            const populatedTemplate  = await getShopEnquiryTemplate(fromUser, args.items);
+            var job = context.dataSources.mailAPI.sendMail(process.env.APP_USER_CREATED_MAILER_TO_ADDRESS, `Lenco Message From ${fromUser.firstName} ${fromUser.lastName}`, populatedTemplate);
+            if (job) return job;
+            throw new ApolloError('Could not generate shop enquiry mailer', 'ACTION_NOT_COMPLETED', {});
         },
         createUser: async (parent, args, context, info) => {
             if (!isEmail.validate(args.user.email)) {

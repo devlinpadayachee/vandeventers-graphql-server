@@ -39,6 +39,7 @@ const typeDefs = gql`
         resetPassword(resetToken: String!, password: String!): UserUpdatedResponse!
         sendUserToUserEmailMessage(to: ID!, from: ID!, message: String!): JSON!
         sendOTP(recipient: String!, message: String!): JSON!
+        sendShopEnquiry(from: ID!, items: JSON!): JSON!
         createUser(user: UserCreateInput): User!
         updateUser(user: UserUpdateInput): UserUpdatedResponse!
         deleteUser(id: ID!): UserDeletedResponse! 

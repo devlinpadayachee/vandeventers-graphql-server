@@ -491,9 +491,9 @@ return `<!doctype html>
 };
 module.exports.getShopEnquiryTemplate = (fromUser, items) => {
   const itemHTML = '';
-  items.map((item, index) => {
-    itemHTML += `<span>${index}: ${item}</span>`
-  })
+  _.forEach(items, function(item, index) {
+    itemHTML += `<span>${index}: ${item}</span>`;
+  });
   return `<!doctype html>
     <html>
       <head>

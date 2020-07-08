@@ -598,18 +598,6 @@ module.exports.getShopEnquiryTemplate = (fromUser, items) => {
       <body>
           <div class="message-box">
               <table cellpadding="0" cellspacing="0">
-                  <tr class="top">
-                      <td colspan="2">
-                          <table>
-                              <tr>
-                                  <td class="title">
-                                      <img src="https://lenco-graphql-client.herokuapp.com/img/logo.ff72e2e1.png" style="width:100%; max-width:100px;">
-                                  </td>
-                              </tr>
-                          </table>
-                      </td>
-                  </tr>
-  
                   <tr class="information">
                       <td colspan="2">
                           <table>

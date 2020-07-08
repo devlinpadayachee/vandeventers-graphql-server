@@ -492,7 +492,7 @@ return `<!doctype html>
 module.exports.getShopEnquiryTemplate = (fromUser, items) => {
   var itemHTML = '';
   _.forEach(items, function(item, index) {
-    itemHTML += `<span>${index}: ${item}</span>`;
+    itemHTML += `<span>${index}: ${item}</span><br>`;
   });
   return `<!doctype html>
     <html>

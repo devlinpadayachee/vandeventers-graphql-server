@@ -490,7 +490,7 @@ return `<!doctype html>
   </html>`
 };
 module.exports.getShopEnquiryTemplate = (fromUser, items) => {
-  const itemHTML = '';
+  var itemHTML = '';
   _.forEach(items, function(item, index) {
     itemHTML += `<span>${index}: ${item}</span>`;
   });

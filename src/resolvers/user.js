@@ -77,7 +77,7 @@ module.exports = {
             const fromUser = await context.dataSources.mongoAPI.user(args.from);
             if (!fromUser) throw new UserInputError('Could not find user specified!');
             const populatedTemplate  = await getShopEnquiryTemplate(fromUser, args.items);
-            var job = context.dataSources.mailAPI.sendMail(process.env.APP_USER_CREATED_MAILER_TO_ADDRESS, `Lenco Message From ${fromUser.firstName} ${fromUser.lastName}`, populatedTemplate);
+            var job = context.dataSources.mailAPI.sendMail(process.env.APP_SHOP_ENQUIRY_MAILER_TO_ADDRESS, `Lenco Shop Enquiry From ${fromUser.firstName} ${fromUser.lastName}`, populatedTemplate);
             if (job) return job;
             throw new ApolloError('Could not generate shop enquiry mailer', 'ACTION_NOT_COMPLETED', {});
         },

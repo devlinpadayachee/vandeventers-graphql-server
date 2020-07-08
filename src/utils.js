@@ -441,7 +441,6 @@ return `<!doctype html>
         }
         </style>
     </head>
-    â€‹
     <body>
         <div class="message-box">
             <table cellpadding="0" cellspacing="0">
@@ -491,6 +490,10 @@ return `<!doctype html>
   </html>`
 };
 module.exports.getShopEnquiryTemplate = (fromUser, items) => {
+  const itemHTML = '';
+  items.map((item, index) => {
+    itemHTML += `<span>${index}: ${item}</span>`
+  })
   return `<!doctype html>
     <html>
       <head>
@@ -592,7 +595,6 @@ module.exports.getShopEnquiryTemplate = (fromUser, items) => {
           }
           </style>
       </head>
-      â€‹
       <body>
           <div class="message-box">
               <table cellpadding="0" cellspacing="0">
@@ -621,7 +623,7 @@ module.exports.getShopEnquiryTemplate = (fromUser, items) => {
                   </tr>
                   <tr class="heading" colspan="2">
                       <td>
-                        ${JSON.stringify(items)}
+                        ${itemHTML}
                       </td>
                   </tr>        
               </table>

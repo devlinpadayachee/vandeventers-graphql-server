@@ -77,6 +77,8 @@ app.use(bodyParser.json({ limit: '200mb' }));
 app.use('/', getArenaConfig());
 server.applyMiddleware({ app });
 
-app.listen({ port: process.env.PORT || 4000 }, () =>
-  console.log(`Server ready at ${process.env.APP_HOST_URL}`)
+app.listen({ port: process.env.PORT || 4000 }, () => {
+        console.log(`Server ready at ${process.env.APP_HOST_URL}`)
+        console.log(`Server using db ${process.env.APP_DB}`)
+    }
 );

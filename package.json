@@ -1,5 +1,5 @@
 {
-  "name": "lenco-graphql-server",
+  "name": "backbone-graphql-server",
   "version": "1.0.0",
   "engines": {
     "node": "14.1.x"

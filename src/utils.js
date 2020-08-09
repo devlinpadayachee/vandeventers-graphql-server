@@ -163,7 +163,7 @@ module.exports.createMongoInstance = async () => {
     const password = await this.getPasswordHash(APP_DEFAULT_ADMIN_PASSWORD);
     const adminUser = await User.create({
       password,
-      firstName: 'lenco',
+      firstName: 'backbone',
       lastName: 'admin',
       idNumber: '8512315344083',
       fullAddress: '1 Sjampanje Street, Wilgeheuwel',
@@ -205,7 +205,7 @@ module.exports.getJWT = ( user ) => {
     user = user.toJSON();
     user.id = user._id;
     delete user._id;
-    const token = jwt.sign(user, 'lenco_jwt_secret'); //Using toJson because user is a mongoose object
+    const token = jwt.sign(user, 'backbone_jwt_secret'); //Using toJson because user is a mongoose object
     resolve(token);
   })
 };
@@ -214,7 +214,7 @@ module.exports.verifyToken = (token) => {
   return new Promise((resolve, reject) => {
     try {
       if (token) {
-        resolve(jwt.verify(token, 'lenco_jwt_secret'));
+        resolve(jwt.verify(token, 'backbone_jwt_secret'));
       }
       resolve(null);
     } catch (err) {
@@ -344,7 +344,7 @@ return `<!doctype html>
   <html>
     <head>
         <meta charset="utf-8">
-        <title>Lenco Message</title>
+        <title>Backbone Message</title>
         
         <style>
         .message-box {
@@ -449,7 +449,7 @@ return `<!doctype html>
                         <table>
                             <tr>
                                 <td class="title">
-                                    <img src="https://lenco-graphql-client.herokuapp.com/img/logo.ff72e2e1.png" style="width:100%; max-width:100px;">
+                                    <img src="https://backbone-graphql-client.herokuapp.com/img/logo.ff72e2e1.png" style="width:100%; max-width:100px;">
                                 </td>
                             </tr>
                         </table>
@@ -477,7 +477,7 @@ return `<!doctype html>
                         <table>
                             <tr>
                                 <td>
-                                  You can get back to me at <a href="${process.env.APP_CLIENT_URL}">Lenco</a><br> 
+                                  You can get back to me at <a href="${process.env.APP_CLIENT_URL}">Backbone</a><br> 
                                   or contact me directly at ${fromUser.email}
                                 </td>
                             </tr>
@@ -498,7 +498,7 @@ module.exports.getShopEnquiryTemplate = (fromUser, items) => {
     <html>
       <head>
           <meta charset="utf-8">
-          <title>Lenco Shop Enquiry</title>
+          <title>Backbone Shop Enquiry</title>
           
           <style>
           .message-box {
@@ -625,7 +625,7 @@ module.exports.getUserOnboardingMailTemplate = (user) => {
     <head>
       <meta name="viewport" content="width=device-width">
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-      <title>Lenco Customer Email </title>
+      <title>Backbone Customer Email </title>
       <style>
       /* -------------------------------------
           INLINED WITH htmlemail.io/inline
@@ -724,7 +724,7 @@ module.exports.getUserOnboardingMailTemplate = (user) => {
             <div class="content" style="box-sizing: border-box; display: block; Margin: 0 auto; max-width: 580px; padding: 10px;">
   
               <!-- START CENTERED WHITE CONTAINER -->
-              <span class="preheader" style="color: transparent; display: none; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;">Lenco Potential Customer</span>
+              <span class="preheader" style="color: transparent; display: none; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;">Backbone Potential Customer</span>
               <table class="main" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #ffffff; border-radius: 3px;">
   
                 <!-- START MAIN CONTENT AREA -->
@@ -733,7 +733,7 @@ module.exports.getUserOnboardingMailTemplate = (user) => {
                     <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
                       <tr>
                         <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
-                          <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Hi Lenco Team,</p>
+                          <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Hi Backbone Team,</p>
                           <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">You have a new customer ${user.email}</p>
                           <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;">
                             <tbody>
@@ -748,10 +748,10 @@ module.exports.getUserOnboardingMailTemplate = (user) => {
                               </tr>
                             </tbody>
                           </table>
-                          <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Login to the Lenco Admin Portal to view the customer</p>
+                          <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Login to the Backbone Admin Portal to view the customer</p>
                           <tbody>
                                   <tr>
-                                      <td style="font-family: sans-serif; font-size: 14px;text-align: center; vertical-align: top; background-color: #000000; border-radius: 5px; text-align: center;"> <a href="https://lenco-graphql-client.herokuapp.com/#/" target="_blank" style="display: inline-block; color: #ffffff; background-color: #000000; border: solid 1px #000000; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #000000;">Take me to the Lenco Admin Portal</a> </td>
+                                      <td style="font-family: sans-serif; font-size: 14px;text-align: center; vertical-align: top; background-color: #000000; border-radius: 5px; text-align: center;"> <a href="https://backbone-graphql-client.herokuapp.com/#/" target="_blank" style="display: inline-block; color: #ffffff; background-color: #000000; border: solid 1px #000000; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #000000;">Take me to the Backbone Admin Portal</a> </td>
                                   </tr>
                                   
                               </tbody>
@@ -770,7 +770,7 @@ module.exports.getUserOnboardingMailTemplate = (user) => {
                 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
                   <tr>
                     <td class="content-block" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;">
-                      <span class="apple-link" style="color: #999999; font-size: 12px; text-align: center;">Lenco Africa (Pty) Ltd ,140a Kelvin Drive, Morningside Manor, 2196</span>
+                      <span class="apple-link" style="color: #999999; font-size: 12px; text-align: center;">Backbone Africa (Pty) Ltd ,140a Kelvin Drive, Morningside Manor, 2196</span>
                       
                     </td>
                   </tr>

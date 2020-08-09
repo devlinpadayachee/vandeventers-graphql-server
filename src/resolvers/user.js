@@ -25,8 +25,10 @@ module.exports = {
     },
     Mutation: {
         login: async (parent, args, context, info) => {
+            console.log('Logging in with:', args.email);
             const user = await context.dataSources.mongoAPI.findUserbyEmail(args.email);
             if (!user) throw new AuthenticationError('Could not find user!');
+            console.log('Got user:', user);
             const passwordMatch = await bcrypt.compare(args.password, user.password);
             if (!passwordMatch) throw new AuthenticationError('The password you supplied is invalid!');
             const token = await getJWT( user );

@@ -23,7 +23,6 @@ const typeDefs = gql`
 
     enum Status {
         open
-        declined
         closed
         resolved
     }

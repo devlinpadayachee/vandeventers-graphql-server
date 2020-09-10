@@ -100,7 +100,7 @@ module.exports.createMongoInstance = async () => {
     timestamps: { currentTime: () => Date.now() }
   });
 
-  const notificationSchema = new Schema({
+  const ticketSchema = new Schema({
     title: {type: String, required: true},
     content: {type: String, required: true},
     user: {type: Schema.Types.ObjectId, required: true},
@@ -140,6 +140,9 @@ module.exports.createMongoInstance = async () => {
     title: {type: String, required: true},
     content: {type: String, required: true},
     featurePicture: {type: String},
+    distiPicture: {type: String},
+    category: {type: String},
+    createdAt: Number,
     createdBy: {type: Schema.Types.ObjectId, required: true},
     createdAt: Number,
     updatedAt: Number,
@@ -149,7 +152,7 @@ module.exports.createMongoInstance = async () => {
   
   const User = mongoose.model('User', userSchema);
   const Post = mongoose.model('Post', postSchema);
-  const Notification = mongoose.model('Notification', notificationSchema);
+  const Ticket = mongoose.model('Ticket', ticketSchema);
   const Branch = mongoose.model('Branch', branchSchema);
   const Reason = mongoose.model('Reason', reasonSchema);
   const Attachment = mongoose.model('Attachment', attachmentSchema);
@@ -178,7 +181,7 @@ module.exports.createMongoInstance = async () => {
   } else {
     console.log('Skipped admin creation')
   }
-  return { User, Post, Notification, Reason, Branch, Attachment, Product };
+  return { User, Post, Ticket, Reason, Branch, Attachment, Product };
 };
 
 module.exports.createFirebaseInstance = async () => {

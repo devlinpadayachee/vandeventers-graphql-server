@@ -12,6 +12,7 @@ module.exports = {
             return product;
         },
         products: async (parent, args, context, info) => {
+            console.log('got products', args)
             const products = await context.dataSources.mongoAPI.products(args.limit, args.skip, args.query);
             return products;
         }

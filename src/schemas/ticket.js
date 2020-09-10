@@ -2,14 +2,14 @@ const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
 
-    type Notification {
+    type Ticket {
         id: ID!
         title: String!
         content: String!
         user: ID!
         userFullName: String
-        assigneeFullName: String
         assignee: ID
+        assigneeFullName: String
         status: Status!
         reason: ID
         comment: String
@@ -21,22 +21,22 @@ const typeDefs = gql`
     }
 
     extend type Query {
-        notification(id:ID!): Notification
-        notifications(limit:Int!, skip:Int!, query: JSON!): NotificationsResponse!
+        ticket(id:ID!): Ticket
+        tickets(limit:Int!, skip:Int!, query: JSON!): TicketsResponse!
     }
 
     extend type Mutation {
-        createNotification(notification: NotificationCreateInput): Notification!
-        updateNotification(notification: NotificationUpdateInput): NotificationUpdatedResponse! 
-        deleteNotification(id: ID!): NotificationDeletedResponse! 
+        createTicket(ticket: TicketCreateInput): Ticket!
+        updateTicket(ticket: TicketUpdateInput): TicketUpdatedResponse! 
+        deleteTicket(id: ID!): TicketDeletedResponse! 
     }
 
-    type NotificationsResponse {
-        records: [Notification]!
+    type TicketsResponse {
+        records: [Ticket]!
         count: Int!
     }
     
-    input NotificationCreateInput {
+    input TicketCreateInput {
         title: String!
         content: String!
         diagnostic: JSON
@@ -46,7 +46,7 @@ const typeDefs = gql`
         createdBy: ID!
     }
 
-    input NotificationUpdateInput {
+    input TicketUpdateInput {
         id: ID!
         title: String
         content: String
@@ -58,16 +58,16 @@ const typeDefs = gql`
         images: JSON
     }
 
-    type NotificationUpdatedResponse {
+    type TicketUpdatedResponse {
         id: ID!
         updated: Boolean!
-        notification: Notification
+        ticket: Ticket
     }
 
-    type NotificationDeletedResponse {
+    type TicketDeletedResponse {
         id: ID!
         deleted: Boolean!
-        notification: Notification
+        ticket: Ticket
     }
 
     

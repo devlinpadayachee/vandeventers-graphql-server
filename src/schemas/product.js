@@ -7,6 +7,9 @@ const typeDefs = gql`
         title: String!
         content: String!
         featurePicture: String
+        distiPicture: String
+        category: String
+        price: Float
         createdBy: ID!
         createdAt: Float!
         updatedAt: Float!
@@ -31,6 +34,10 @@ const typeDefs = gql`
     input ProductCreateInput {
         title: String!
         content: String!
+        featurePicture: String
+        distiPicture: String
+        category: String!
+        price: Float!
         createdBy: ID!
     }
 
@@ -39,6 +46,9 @@ const typeDefs = gql`
         title: String
         content: String
         featurePicture: String
+        distiPicture: String
+        category: String
+        price: Float
     }
 
     type ProductUpdatedResponse {

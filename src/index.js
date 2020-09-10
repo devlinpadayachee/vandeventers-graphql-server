@@ -11,7 +11,7 @@ const BaseTypeDef = require ('./schemas/base');
 const UserTypeDef = require ('./schemas/user');
 const BranchTypeDef = require ('./schemas/branch');
 const PostTypeDef = require ('./schemas/post');
-const NotificationTypeDef = require ('./schemas/notification');
+const TicketTypeDef = require ('./schemas/ticket');
 const ReasonTypeDef = require ('./schemas/reason');
 const AttachmentTypeDef = require ('./schemas/attachment');
 const ProductTypeDef = require ('./schemas/product');
@@ -19,7 +19,7 @@ const BaseResolver = require('./resolvers/base');
 const UserResolver = require('./resolvers/user');
 const BranchResolver = require('./resolvers/branch');
 const PostResolver = require('./resolvers/post');
-const NotificationResolver = require('./resolvers/notification');
+const TicketResolver = require('./resolvers/ticket');
 const ReasonResolver = require('./resolvers/reason');
 const AttachmentResolver = require('./resolvers/attachment');
 const ProductResolver = require('./resolvers/product');
@@ -44,8 +44,8 @@ var mailerQueueInstance;
 
 const schema = applyMiddleware(
     makeExecutableSchema({
-        typeDefs: [ BaseTypeDef, UserTypeDef, BranchTypeDef, PostTypeDef, NotificationTypeDef, ReasonTypeDef, AttachmentTypeDef, ProductTypeDef ],
-        resolvers: _.merge( BaseResolver, UserResolver, BranchResolver, PostResolver, NotificationResolver, ReasonResolver, AttachmentResolver, ProductResolver )
+        typeDefs: [ BaseTypeDef, UserTypeDef, BranchTypeDef, PostTypeDef, TicketTypeDef, ReasonTypeDef, AttachmentTypeDef, ProductTypeDef ],
+        resolvers: _.merge( BaseResolver, UserResolver, BranchResolver, PostResolver, TicketResolver, ReasonResolver, AttachmentResolver, ProductResolver )
     }),
     permissions
 );
@@ -75,6 +75,11 @@ const server = new ApolloServer({
 const app = express();
 app.use(bodyParser.json({ limit: '200mb' }));
 app.use('/', getArenaConfig());
+app.use('/test', function (req, res, next) {
+    console.log('Received Request Type:', req.method)
+    console.log('Received Request Body:', req.body)
+    res.send('ok')
+})
 server.applyMiddleware({ app });
 
 app.listen({ port: process.env.PORT || 4000 }, () => {

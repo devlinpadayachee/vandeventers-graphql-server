@@ -12,7 +12,7 @@ class mongoAPI extends DataSource {
     this.User = mongoInstance.User;
     this.Branch = mongoInstance.Branch;
     this.Post = mongoInstance.Post;
-    this.Notification = mongoInstance.Notification;
+    this.Ticket = mongoInstance.Ticket;
     this.Reason = mongoInstance.Reason;
     this.Attachment = mongoInstance.Attachment;
     this.Product = mongoInstance.Product;
@@ -213,24 +213,24 @@ class mongoAPI extends DataSource {
     }
   }
 
-  //Notifications
-  async notification(id) {
+  //Tickets
+  async ticket(id) {
     try {
-      const notification = await this.Notification.findOne({ _id: id });
-      return notification ? notification : null;
+      const ticket = await this.Ticket.findOne({ _id: id });
+      return ticket ? ticket : null;
     } catch(e){
-      console.log('Oops Something went wrong with finding the notification');
+      console.log('Oops Something went wrong with finding the ticket');
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
 
-  async notifications(limit = 10, skip = 0, query = {}) {
+  async tickets(limit = 10, skip = 0, query = {}) {
     try {
-      const count = await this.Notification.where(query).countDocuments();
+      const count = await this.Ticket.where(query).countDocuments();
       if (skip >= count) {
         skip = 0;
       }
-      const records = await this.Notification.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
+      const records = await this.Ticket.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
       return records.length > 0 ? { records, count } : { records : [], count: 0 };
     } catch(e){
       console.log('Oops Something went wrong', e);
@@ -238,31 +238,31 @@ class mongoAPI extends DataSource {
     }
   }
 
-  async createNotification(args) {
+  async createTicket(args) {
     try {
-      const notification = await this.Notification.create(args);
-      return notification ? notification : null;
+      const ticket = await this.Ticket.create(args);
+      return ticket ? ticket : null;
     } catch(e){
       console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
 
-  async updateNotification(args) {
+  async updateTicket(args) {
     try {
       const id = args.id
-      const updatedNotification = await this.Notification.findOneAndUpdate({ _id: id }, args, { new: true } );
-      return updatedNotification ? { id, updated: true, notification: updatedNotification } : { id, updated: false, notification: null};
+      const updatedTicket = await this.Ticket.findOneAndUpdate({ _id: id }, args, { new: true } );
+      return updatedTicket ? { id, updated: true, ticket: updatedTicket } : { id, updated: false, ticket: null};
     } catch(e){
       console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }
   }
 
-  async deleteNotification(id) {
+  async deleteTicket(id) {
     try {
-      const deletedNotification = await this.Notification.deleteOne({ _id: id });
-      return deletedNotification.deletedCount > 0 ? { id, deleted: true, notification: deletedNotification } : { id, deleted: false, notification: null };
+      const deletedTicket = await this.Ticket.deleteOne({ _id: id });
+      return deletedTicket.deletedCount > 0 ? { id, deleted: true, ticket: deletedTicket } : { id, deleted: false, ticket: null };
     } catch(e){
       console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});

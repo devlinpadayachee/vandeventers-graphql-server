@@ -142,7 +142,16 @@ module.exports.createMongoInstance = async () => {
     featurePicture: {type: String},
     distiPicture: {type: String},
     category: {type: String},
+    createdBy: {type: Schema.Types.ObjectId, required: true},
     createdAt: Number,
+    updatedAt: Number,
+  },{
+    timestamps: { currentTime: () => Date.now() }
+  });
+
+  const orderSchema = new Schema({
+    totalAmount: {type: Number, required: true},
+    products: {type: Array, required: true},
     createdBy: {type: Schema.Types.ObjectId, required: true},
     createdAt: Number,
     updatedAt: Number,
@@ -157,6 +166,7 @@ module.exports.createMongoInstance = async () => {
   const Reason = mongoose.model('Reason', reasonSchema);
   const Attachment = mongoose.model('Attachment', attachmentSchema);
   const Product = mongoose.model('Product', productSchema);
+  const Order = mongoose.model('Order', orderSchema);
  
   const APP_DEFAULT_ADMIN_EMAIL = process.env.APP_DEFAULT_ADMIN_EMAIL || 'devlinpadayachee@gmail.com';
   const APP_DEFAULT_ADMIN_PASSWORD= process.env.APP_DEFAULT_ADMIN_PASSWORD || 'Sepiroth6043@';
@@ -181,7 +191,7 @@ module.exports.createMongoInstance = async () => {
   } else {
     console.log('Skipped admin creation')
   }
-  return { User, Post, Ticket, Reason, Branch, Attachment, Product };
+  return { User, Post, Ticket, Reason, Branch, Attachment, Product, Order };
 };
 
 module.exports.createFirebaseInstance = async () => {

@@ -16,6 +16,7 @@ class mongoAPI extends DataSource {
     this.Reason = mongoInstance.Reason;
     this.Attachment = mongoInstance.Attachment;
     this.Product = mongoInstance.Product;
+    this.Order = mongoInstance.Order;
   }
   
   initialize(config) {
@@ -432,6 +433,62 @@ class mongoAPI extends DataSource {
     try {
       const deletedProduct = await this.Product.deleteOne({ _id: id });
       return deletedProduct.deletedCount > 0 ? { id, deleted: true, product: deletedProduct } : { id, deleted: false, product: null };
+    } catch(e){
+      console.log('Oops Something went wrong', e);
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  //Orders
+  async order(id) {
+    try {
+      const order = await this.Order.findOne({ _id: id });
+      return order ? order : null;
+    } catch(e){
+      console.log('Oops Something went wrong with finding the order');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async orders(limit = 10, skip = 0, query = {}) {
+    try {
+      const count = await this.Order.where(query).countDocuments();
+      if (skip >= count) {
+        skip = 0;
+      }
+      const records = await this.Order.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
+      return records.length > 0 ? { records, count } : { records : [], count: 0 };
+    } catch(e){
+      console.log('Oops Something went wrong', e);
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async createOrder(args) {
+    try {
+      const order = await this.Order.create(args);
+      return order ? order : null;
+    } catch(e){
+      console.log('Oops Something went wrong', e);
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async updateOrder(args) {
+    try {
+      const id = args.id
+      const updatedOrder = await this.Order.findOneAndUpdate({ _id: id }, args, { new: true } );
+      return updatedOrder ? { id, updated: true, order: updatedOrder } : { id, updated: false, order: null };
+    } catch(e){
+      console.log('Oops Something went wrong', e);
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async deleteOrder(id) {
+    try {
+      const deletedOrder = await this.Order.deleteOne({ _id: id });
+      return deletedOrder.deletedCount > 0 ? { id, deleted: true, order: deletedOrder } : { id, deleted: false, order: null };
     } catch(e){
       console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});

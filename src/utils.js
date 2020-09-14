@@ -142,6 +142,7 @@ module.exports.createMongoInstance = async () => {
     featurePicture: {type: String},
     distiPicture: {type: String},
     category: {type: String},
+    price: {type: Number},
     createdBy: {type: Schema.Types.ObjectId, required: true},
     createdAt: Number,
     updatedAt: Number,

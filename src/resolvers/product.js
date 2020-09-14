@@ -31,6 +31,14 @@ module.exports = {
                 console.log(fileUrl)
                 args.product.featurePicture = fileUrl;
             }
+            if (args?.product?.distiPicture){
+                console.log('Attempting to get fileUrl from FireBase');
+                let mimeType = args?.product?.distiPicture.match(/[^:]\w+\/[\w-+\d.]+(?=;|,)/)[0];
+                const fileUrl = await context.dataSources.firebaseAPI.uploadFile(mime.extension(mimeType), `product-disti-pictures/${args.product.id}`, { working: true }, mimeType, args.product.distiPicture);
+                console.log(fileUrl)
+                args.product.distiPicture = fileUrl;
+            }
+            console.log(args);
             const updated = await context.dataSources.mongoAPI.updateProduct(args.product);
             if (updated) return updated;
             throw new ApolloError('Could not update product', 'ACTION_NOT_COMPLETED', {});

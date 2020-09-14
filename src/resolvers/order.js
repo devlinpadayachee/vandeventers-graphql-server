@@ -18,6 +18,7 @@ module.exports = {
     },
     Mutation: {
         createOrder: async (parent, args, context, info) => {
+            console.log(args);
             const order = await context.dataSources.mongoAPI.createOrder(args.order);
             if (order) return order;
             throw new ApolloError('Could not create order', 'ACTION_NOT_COMPLETED', {});

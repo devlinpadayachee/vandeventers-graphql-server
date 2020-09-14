@@ -153,6 +153,8 @@ module.exports.createMongoInstance = async () => {
   const orderSchema = new Schema({
     totalAmount: {type: Number, required: true},
     products: {type: Array, required: true},
+    deliveryDate: Number,
+    deliveryAddress: {type: String},
     createdBy: {type: Schema.Types.ObjectId, required: true},
     createdAt: Number,
     updatedAt: Number,

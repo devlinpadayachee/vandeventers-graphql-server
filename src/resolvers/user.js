@@ -66,7 +66,7 @@ module.exports = {
             const fromUser = await context.dataSources.mongoAPI.user(args.from);
             if (!toUser || !fromUser) throw new UserInputError('Could not find one of the users specified!');
             const populatedTemplate  = await getUserToUserMailTemplate(toUser, fromUser, args.message);
-            var job = context.dataSources.mailAPI.sendMail(toUser.email, `Backbone Message From ${fromUser.firstName} ${fromUser.lastName}`, populatedTemplate);
+            var job = context.dataSources.mailAPI.sendMail(toUser.email, `NLA Message From ${fromUser.firstName} ${fromUser.lastName}`, populatedTemplate);
             if (job) return job;
             throw new ApolloError('Could not generate user to user message mailer', 'ACTION_NOT_COMPLETED', {});
         },
@@ -79,7 +79,7 @@ module.exports = {
             const fromUser = await context.dataSources.mongoAPI.user(args.from);
             if (!fromUser) throw new UserInputError('Could not find user specified!');
             const populatedTemplate  = await getShopEnquiryTemplate(fromUser, args.items);
-            var job = context.dataSources.mailAPI.sendMail(process.env.APP_SHOP_ENQUIRY_MAILER_TO_ADDRESS, `Backbone Shop Enquiry From ${fromUser.firstName} ${fromUser.lastName}`, populatedTemplate);
+            var job = context.dataSources.mailAPI.sendMail(process.env.APP_SHOP_ENQUIRY_MAILER_TO_ADDRESS, `NLA Shop Enquiry From ${fromUser.firstName} ${fromUser.lastName}`, populatedTemplate);
             if (job) return job;
             throw new ApolloError('Could not generate shop enquiry mailer', 'ACTION_NOT_COMPLETED', {});
         },
@@ -93,7 +93,7 @@ module.exports = {
             const user = await context.dataSources.mongoAPI.createUser(args.user);
             if (user) {
                 const populatedTemplate  = await getUserOnboardingMailTemplate(user);
-                var job = context.dataSources.mailAPI.sendMail(process.env.APP_USER_CREATED_MAILER_TO_ADDRESS, `Backbone Has A New Customer`, populatedTemplate);
+                var job = context.dataSources.mailAPI.sendMail(process.env.APP_USER_CREATED_MAILER_TO_ADDRESS, `NLA Has A New Customer`, populatedTemplate);
                 return user;
             }
             throw new ApolloError('Could not create user', 'ACTION_NOT_COMPLETED', {});

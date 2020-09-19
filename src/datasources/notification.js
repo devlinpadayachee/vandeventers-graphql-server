@@ -54,7 +54,7 @@ class notificationAPI extends DataSource {
   }
   async sendSMS(recipient, message) {
     try {
-      const response = await axios.post('http://144.91.64.120:9010/api/sms/simplified', { text: message, sender: 'Backbone', recipient: recipient});
+      const response = await axios.post('http://144.91.64.120:9010/api/sms/simplified', { text: message, sender: 'NLA', recipient: recipient});
       return response.data;
     } catch (e) {
       console.error(e);

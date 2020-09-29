@@ -2,16 +2,6 @@ const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
 
-    type Query {
-        ping: String!
-        mailTest: JSON!
-        fileUploadTest: String!
-    }
-
-    type Mutation {
-        changeConfig: String!
-    }
-
     scalar JSON
     scalar JSONObject
 
@@ -41,6 +31,31 @@ const typeDefs = gql`
         city: String!
         country: String!
         postalCode: String!
+    }
+
+    type Payfast {
+        merchantID: String!
+        merchantKey: String!
+        passPhrase: String!
+        returnURL: String!
+        cancelURL: String!
+        notifyURL: String!
+    }
+
+    type Settings {
+        payfast: Payfast!
+        storeAddress: Address!
+    }
+
+    type Query {
+        ping: String!
+        mailTest: JSON!
+        fileUploadTest: String!
+        settings: Settings!
+    }
+
+    type Mutation {
+        changeConfig: String!
     }
         
 `;

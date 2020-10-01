@@ -17,6 +17,7 @@ class mongoAPI extends DataSource {
     this.Attachment = mongoInstance.Attachment;
     this.Product = mongoInstance.Product;
     this.Order = mongoInstance.Order;
+    this.Tag = mongoInstance.Tag;
   }
   
   initialize(config) {
@@ -490,6 +491,62 @@ class mongoAPI extends DataSource {
       const deletedOrder = await this.Order.deleteOne({ _id: id });
       return deletedOrder.deletedCount > 0 ? { id, deleted: true, order: deletedOrder } : { id, deleted: false, order: null };
     } catch(e){
+      console.log('Oops Something went wrong', e);
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  //Tags
+  async tag(id) {
+    try {
+      const tag = await this.Tag.findOne({ _id: id });
+      return tag ? tag : null;
+    } catch (e) {
+      console.log('Oops Something went wrong with finding the tag');
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async tags(limit = 10, skip = 0, query = {}) {
+    try {
+      const count = await this.Tag.where(query).countDocuments();
+      if (skip >= count) {
+        skip = 0;
+      }
+      const records = await this.Tag.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
+      return records.length > 0 ? { records, count } : { records: [], count: 0 };
+    } catch (e) {
+      console.log('Oops Something went wrong', e);
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async createTag(args) {
+    try {
+      const tag = await this.Tag.create(args);
+      return tag ? tag : null;
+    } catch (e) {
+      console.log('Oops Something went wrong', e);
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async updateTag(args) {
+    try {
+      const id = args.id
+      const updatedTag = await this.Tag.findOneAndUpdate({ _id: id }, args, { new: true });
+      return updatedTag ? { id, updated: true, tag: updatedTag } : { id, updated: false, tag: null };
+    } catch (e) {
+      console.log('Oops Something went wrong', e);
+      throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
+    }
+  }
+
+  async deleteTag(id) {
+    try {
+      const deletedTag = await this.Tag.deleteOne({ _id: id });
+      return deletedTag.deletedCount > 0 ? { id, deleted: true, tag: deletedTag } : { id, deleted: false, tag: null };
+    } catch (e) {
       console.log('Oops Something went wrong', e);
       throw new ApolloError(e.message, 'ACTION_NOT_COMPLETED', {});
     }

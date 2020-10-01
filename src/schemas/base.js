@@ -17,6 +17,13 @@ const typeDefs = gql`
         resolved
     }
 
+    enum TagType {
+        user
+        product
+        post
+        ticket
+    }
+
     enum AttachmentType {
         image
     }

@@ -10,6 +10,8 @@ const typeDefs = gql`
         distiPicture: String
         category: String
         price: Float
+        tagIDs: [ID]
+        tags: [Tag]
         createdBy: ID!
         createdAt: Float!
         updatedAt: Float!
@@ -38,6 +40,7 @@ const typeDefs = gql`
         distiPicture: String
         category: String!
         price: Float!
+        tagIDs: [ID]
         createdBy: ID!
     }
 
@@ -49,6 +52,7 @@ const typeDefs = gql`
         distiPicture: String
         category: String
         price: Float
+        tagIDs: [ID]
     }
 
     type ProductUpdatedResponse {

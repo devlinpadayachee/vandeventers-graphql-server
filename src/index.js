@@ -16,6 +16,7 @@ const ReasonTypeDef = require ('./schemas/reason');
 const AttachmentTypeDef = require ('./schemas/attachment');
 const ProductTypeDef = require ('./schemas/product');
 const OrderTypeDef = require ('./schemas/order');
+const TagTypeDef = require ('./schemas/tag');
 const XpressdoxTypeDef = require ('./schemas/xpressdox');
 const BaseResolver = require('./resolvers/base');
 const UserResolver = require('./resolvers/user');
@@ -26,6 +27,7 @@ const ReasonResolver = require('./resolvers/reason');
 const AttachmentResolver = require('./resolvers/attachment');
 const ProductResolver = require('./resolvers/product');
 const OrderResolver = require('./resolvers/order');
+const TagResolver = require('./resolvers/tag');
 const XpressdoxResolver = require('./resolvers/xpressdox');
 const permissions = require('./permissions');
 
@@ -49,8 +51,8 @@ var mailerQueueInstance;
 
 const schema = applyMiddleware(
     makeExecutableSchema({
-        typeDefs: [BaseTypeDef, UserTypeDef, BranchTypeDef, PostTypeDef, TicketTypeDef, ReasonTypeDef, AttachmentTypeDef, ProductTypeDef, OrderTypeDef, XpressdoxTypeDef ],
-        resolvers: _.merge(BaseResolver, UserResolver, BranchResolver, PostResolver, TicketResolver, ReasonResolver, AttachmentResolver, ProductResolver, OrderResolver, XpressdoxResolver )
+        typeDefs: [BaseTypeDef, UserTypeDef, BranchTypeDef, PostTypeDef, TicketTypeDef, ReasonTypeDef, AttachmentTypeDef, ProductTypeDef, OrderTypeDef, TagTypeDef, XpressdoxTypeDef ],
+        resolvers: _.merge(BaseResolver, UserResolver, BranchResolver, PostResolver, TicketResolver, ReasonResolver, AttachmentResolver, ProductResolver, OrderResolver, TagResolver, XpressdoxResolver )
     }),
     permissions
 );

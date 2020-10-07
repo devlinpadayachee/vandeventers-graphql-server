@@ -144,6 +144,7 @@ module.exports.createMongoInstance = async () => {
     category: {type: String},
     price: {type: Number},
     tagIDs: [Schema.Types.ObjectId],
+    digitalItem: { type: String },
     createdBy: {type: Schema.Types.ObjectId, required: true},
     createdAt: Number,
     updatedAt: Number,

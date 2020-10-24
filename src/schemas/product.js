@@ -13,6 +13,7 @@ const typeDefs = gql`
         tagIDs: [ID]
         tags: [Tag]
         digitalItem: String
+        disclaimer: String
         createdBy: ID!
         createdAt: Float!
         updatedAt: Float!
@@ -43,6 +44,7 @@ const typeDefs = gql`
         price: Float!
         tagIDs: [ID]
         digitalItem: String
+        disclaimer: String
         createdBy: ID!
     }
 
@@ -56,6 +58,7 @@ const typeDefs = gql`
         price: Float
         tagIDs: [ID]
         digitalItem: String
+        disclaimer: String
     }
 
     type ProductUpdatedResponse {

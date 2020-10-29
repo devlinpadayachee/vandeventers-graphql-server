@@ -7,7 +7,7 @@ const typeDefs = gql`
         totalAmount: Float!
         products: JSON!
         deliveryDate: Float
-        deliveryAddress: String
+        deliveryAddress: String 
         createdBy: ID!
         createdAt: Float!
         updatedAt: Float!

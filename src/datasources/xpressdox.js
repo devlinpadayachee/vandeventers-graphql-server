@@ -9,7 +9,7 @@ const axios = require('axios');
 const qs = require('qs');
 var convert = require('xml-js');
 
-class smappeeAPI extends DataSource {
+class xpressdoxAPI extends DataSource {
   constructor({}) {
     super();
   }
@@ -100,4 +100,4 @@ class smappeeAPI extends DataSource {
 
 }
 
-module.exports = smappeeAPI;
+module.exports = xpressdoxAPI;

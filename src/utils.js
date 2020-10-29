@@ -12,6 +12,7 @@ var Queue = require('bull');
 var soap = require('soap');
 var firebaseAdmin = require('firebase-admin');
 var firebaseServiceAccount = require('../firebase-service-account.json');
+var convert = require('xml-js');
 
 
 module.exports.paginateResults = ({
@@ -174,6 +175,16 @@ module.exports.createMongoInstance = async () => {
   },{
     timestamps: { currentTime: () => Date.now() }
   });
+
+  const xpressDoxReturnSchema = new Schema({
+    order: { type: Schema.Types.ObjectId, required: true },
+    product: { type: Schema.Types.ObjectId, required: true },
+    data: { type: Object },
+    createdAt: Number,
+    updatedAt: Number,
+  },{
+    timestamps: { currentTime: () => Date.now() }
+  });
   
   const User = mongoose.model('User', userSchema);
   const Post = mongoose.model('Post', postSchema);
@@ -184,6 +195,7 @@ module.exports.createMongoInstance = async () => {
   const Product = mongoose.model('Product', productSchema);
   const Order = mongoose.model('Order', orderSchema);
   const Tag = mongoose.model('Tag', tagSchema);
+  const XpressDoxReturn = mongoose.model('XpressDoxReturn', xpressDoxReturnSchema);
  
   const APP_DEFAULT_ADMIN_EMAIL = process.env.APP_DEFAULT_ADMIN_EMAIL || 'devlinpadayachee@gmail.com';
   const APP_DEFAULT_ADMIN_PASSWORD= process.env.APP_DEFAULT_ADMIN_PASSWORD || 'Sepiroth6043@';
@@ -208,7 +220,7 @@ module.exports.createMongoInstance = async () => {
   } else {
     console.log('Skipped admin creation')
   }
-  return { User, Post, Ticket, Reason, Branch, Attachment, Product, Order, Tag };
+  return { User, Post, Ticket, Reason, Branch, Attachment, Product, Order, Tag, XpressDoxReturn };
 };
 
 module.exports.createFirebaseInstance = async () => {
@@ -349,6 +361,7 @@ function sendMail (to, subject, html, attachments) {
     });
   })
 }
+
 module.exports.getArenaConfig = () => {
   const arenaConfig = Arena({
     queues: [
@@ -368,6 +381,21 @@ module.exports.getArenaConfig = () => {
   });
   return arenaConfig;
 };
+
+module.exports.sanitizeXpressDoxXML = (data) => {
+  return new Promise((resolve, reject) => {
+    try {
+      if (data) {
+        var jsonFromXpressdoxReturn = JSON.parse(convert.xml2json(data, { ignoreComment: true, ignoreAttributes: true, compact: true, spaces: 2 }));
+        resolve(jsonFromXpressdoxReturn);
+      }
+      resolve(null);
+    } catch (err) {
+      resolve(null);
+    }
+  })
+};
+
 module.exports.getUserToUserMailTemplate = (toUser, fromUser, message) => {
 
 return `<!doctype html>

@@ -104,7 +104,8 @@ app.use('/xpressDoxReturnURL', async function (req, res, next) {
         const xpressDoxReturn = await mongoInstance.XpressDoxReturn.create({ order, product, data: sanitizedData });
         // return xpressDoxReturn ? xpressDoxReturn : null;
         if(xpressDoxReturn) {
-            res.send(xpressDoxReturn);
+            res.redirect(301, `https://nla-graphql-client.herokuapp.com/xpressdox/success/${order}/${product}/`);
+            // res.send(xpressDoxReturn);
         } else {
             res.status(400).send('Oops Something went wrong, could not create a xpressDoxReturn record'); 
         }

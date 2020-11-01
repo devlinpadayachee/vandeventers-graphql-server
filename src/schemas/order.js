@@ -29,8 +29,8 @@ const typeDefs = gql`
     input OrderCreateInput {
         totalAmount: Float!
         products: JSON!
-        deliveryDate: Float!
-        deliveryAddress: String!
+        deliveryDate: Float
+        deliveryAddress: String
         payment: String
         status: String
         createdBy: ID!

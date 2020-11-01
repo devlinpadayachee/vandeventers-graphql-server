@@ -7,7 +7,9 @@ const typeDefs = gql`
         totalAmount: Float!
         products: JSON!
         deliveryDate: Float
-        deliveryAddress: String 
+        deliveryAddress: String
+        payment: String
+        status: String
         createdBy: ID!
         createdAt: Float!
         updatedAt: Float!
@@ -29,6 +31,8 @@ const typeDefs = gql`
         products: JSON!
         deliveryDate: Float!
         deliveryAddress: String!
+        payment: String
+        status: String
         createdBy: ID!
     }
 
@@ -38,6 +42,8 @@ const typeDefs = gql`
         products: JSON
         deliveryDate: Float
         deliveryAddress: String
+        payment: String
+        status: String
     }
 
     type OrdersResponse {

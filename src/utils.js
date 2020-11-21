@@ -160,6 +160,7 @@ module.exports.createMongoInstance = async () => {
     deliveryDate: Number,
     deliveryAddress: {type: String},
     payment: {type: String},
+    payfastRef: {type: String},
     status: { type: String },
     createdBy: {type: Schema.Types.ObjectId, required: true},
     createdAt: Number,

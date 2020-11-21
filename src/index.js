@@ -114,11 +114,24 @@ app.use('/xpressDoxReturnURL', async function (req, res, next) {
         res.status(400).send('Oops Something went wrong, could not create a xpressDoxReturn record');
     }
 });
-app.use('/payfastNotifyURL', function (req, res, next) {
+app.use('/payfastNotifyURL', async function (req, res, next) {
     console.log('Received Request Type:', req.method);
-    console.log('Received Request Body:', req);
+    console.log('Received Request Body:', req.body);
+    let m_payment_id = req.body.m_payment_id;
+    let pf_payment_id = req.body.pf_payment_id;
+    let payment_status = req.body.payment_status;
+    try {
+        if (m_payment_id && pf_payment_id && payment_status) {
+            const orderUpdate = await mongoInstance.Order.findOneAndUpdate({ _id: m_payment_id }, { payfastRef: pf_payment_id, payment: payment_status}, { new: true }); 
+        } else {
+            console.log('Could not update order');
+        }
+    } catch (error) {
+        console.log(error);
+    }
     res.send('ok');
 });
+
 server.applyMiddleware({ app });
 
 app.listen({ port: process.env.PORT || 4000 }, () => {

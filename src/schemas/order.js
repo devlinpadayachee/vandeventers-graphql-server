@@ -9,6 +9,7 @@ const typeDefs = gql`
         deliveryDate: Float
         deliveryAddress: String
         payment: String
+        payfastRef: String
         status: String
         createdBy: ID!
         createdAt: Float!
@@ -43,6 +44,7 @@ const typeDefs = gql`
         deliveryDate: Float
         deliveryAddress: String
         payment: String
+        payfastRef: String
         status: String
     }
 

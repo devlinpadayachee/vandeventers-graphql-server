@@ -114,7 +114,7 @@ app.use('/xpressDoxReturnURL', async function (req, res, next) {
         res.status(400).send('Oops Something went wrong, could not create a xpressDoxReturn record');
     }
 });
-app.use('/payfastReturnURL', function (req, res, next) {
+app.use(process.env.APP_PAYFAST_NOTIFY_URL, function (req, res, next) {
     console.log('Received Request Type:', req.method);
     console.log('Received Request Body:', req);
     res.send('ok');

@@ -135,7 +135,7 @@ app.use('/payfastNotifyURL', async function (req, res, next) {
 server.applyMiddleware({ app });
 
 app.listen({ port: process.env.PORT || 4000 }, () => {
-        console.log(`Server ready at ${process.env.APP_HOST_URL}`)
+        console.log(`Server started at ${process.env.APP_HOST_URL}`)
         console.log(`Server using db ${process.env.APP_DB}`)
     }
 );

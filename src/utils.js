@@ -1,19 +1,15 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
-const pdf = require('html-pdf');
-const Arena = require('bull-arena');
-const isEmail = require('isemail');
-const moment =  require('moment');
-const _ =  require('lodash');
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+const pdf = require("html-pdf");
+const Arena = require("bull-arena");
+const isEmail = require("isemail");
+const _ = require("lodash");
 const { Schema } = mongoose;
-var Queue = require('bull');
-var soap = require('soap');
-var firebaseAdmin = require('firebase-admin');
-var firebaseServiceAccount = require('../firebase-service-account.json');
-var convert = require('xml-js');
-
+var Queue = require("bull");
+var firebaseAdmin = require("firebase-admin");
+var firebaseServiceAccount = require("../firebase-service-account.json");
 
 module.exports.paginateResults = ({
   after: cursor,
@@ -25,7 +21,7 @@ module.exports.paginateResults = ({
   if (pageSize < 1) return [];
 
   if (!cursor) return results.slice(0, pageSize);
-  const cursorIndex = results.findIndex(item => {
+  const cursorIndex = results.findIndex((item) => {
     // if an item has a `cursor` on it, use that, otherwise try to generate one
     let itemCursor = item.cursor ? item.cursor : getCursor(item);
 
@@ -38,288 +34,285 @@ module.exports.paginateResults = ({
       ? []
       : results.slice(
           cursorIndex + 1,
-          Math.min(results.length, cursorIndex + 1 + pageSize),
+          Math.min(results.length, cursorIndex + 1 + pageSize)
         )
     : results.slice(0, pageSize);
 };
 
 module.exports.createMongoInstance = async () => {
-  mongoose.set('useNewUrlParser', true);
-  mongoose.set('useFindAndModify', false);
-  mongoose.set('useCreateIndex', true);
-  mongoose.set('useUnifiedTopology', true);
+  mongoose.set("useNewUrlParser", true);
+  mongoose.set("useFindAndModify", false);
+  mongoose.set("useCreateIndex", true);
+  mongoose.set("useUnifiedTopology", true);
   mongoose.connect(process.env.APP_DB);
   var db = mongoose.connection;
-  db.on('error', console.error.bind(console, 'connection error:'));
-  db.once('open', function() {
-    console.log('Mongo DB connected')
+  db.on("error", console.error.bind(console, "connection error:"));
+  db.once("open", function () {
+    console.log("Mongo DB connected");
   });
 
-  const userSchema = new Schema({
-    firstName: {type: String, required: true},
-    lastName: {type: String, required: true},
-    idNumber: {type: String},
-    password: {type: String, required: true},
-    fullAddress: {type: String, required: true},
-    telNumber: {type: String},
-    rating: Number,
-    email: {type: String, required: true, index: true, unique: true},
-    bio:  {type: String},
-    title: {type: String},
-    industry: {type: String},
-    role: {type: String, required: true, enum: ['admin', 'user']},
-    branch: {type: String},
-    pushToken: {type: String},
-    location: {type: Object},
-    metaData: {type: Object},
-    profilePicture: {type: String},
-    loginCounter: Number,
-    resetToken: {type: String},
-    createdAt: Number,
-    updatedAt: Number,
-  },{
-    timestamps: { currentTime: () => Date.now() }
-  });
+  const userSchema = new Schema(
+    {
+      firstName: { type: String, required: true },
+      lastName: { type: String, required: true },
+      idNumber: { type: String },
+      password: { type: String, required: true },
+      fullAddress: { type: String, required: true },
+      telNumber: { type: String },
+      rating: Number,
+      email: { type: String, required: true, index: true, unique: true },
+      bio: { type: String },
+      title: { type: String },
+      industry: { type: String },
+      role: { type: String, required: true, enum: ["admin", "user"] },
+      branch: { type: String },
+      pushToken: { type: String },
+      location: { type: Object },
+      metaData: { type: Object },
+      profilePicture: { type: String },
+      loginCounter: Number,
+      resetToken: { type: String },
+      createdAt: Number,
+      updatedAt: Number,
+    },
+    {
+      timestamps: { currentTime: () => Date.now() },
+    }
+  );
 
-  const branchSchema = new Schema({
-    name: {type: String, required: true},
-    createdBy: {type: Schema.Types.ObjectId, required: true},
-    createdAt: Number,
-    updatedAt: Number,
-  },{
-    timestamps: { currentTime: () => Date.now() }
-  });
-  
-  const postSchema = new Schema({
-    title: {type: String, required: true},
-    content: {type: String, required: true},
-    featurePicture: {type: String},
-    createdBy: {type: Schema.Types.ObjectId, required: true},
-    createdAt: Number,
-    updatedAt: Number,
-  },{
-    timestamps: { currentTime: () => Date.now() }
-  });
+  const documentSchema = new Schema(
+    {
+      name: { type: String, required: true },
+      user: { type: Schema.Types.ObjectId, required: true },
+      docClass: { type: String },
+      category: { type: Schema.Types.ObjectId, required: true },
+      documentLink: { type: String },
+      documentFileName: { type: String },
+      createdBy: { type: Schema.Types.ObjectId, required: true },
+      createdAt: Number,
+      updatedAt: Number,
+    },
+    {
+      timestamps: { currentTime: () => Date.now() },
+    }
+  );
 
-  const ticketSchema = new Schema({
-    title: {type: String, required: true},
-    content: {type: String, required: true},
-    user: {type: Schema.Types.ObjectId, required: true},
-    assignee: {type: Schema.Types.ObjectId},
-    status: {type: String, required: true, enum: ['open', 'declined','closed','resolved']},
-    reason: {type: Schema.Types.ObjectId},
-    comment: {type: String},
-    diagnostic: {type: Object},
-    images: {type: Array},
-    createdBy: {type: Schema.Types.ObjectId, required: true},
-    createdAt: Number,
-    updatedAt: Number,
-  },{
-    timestamps: { currentTime: () => Date.now() }
-  });
+  const categorySchema = new Schema(
+    {
+      name: { type: String, required: true },
+      docClass: { type: String, required: true },
+      parent: { type: Schema.Types.ObjectId },
+      createdBy: { type: Schema.Types.ObjectId, required: true },
+      createdAt: Number,
+      updatedAt: Number,
+    },
+    {
+      timestamps: { currentTime: () => Date.now() },
+    }
+  );
 
-  const reasonSchema = new Schema({
-    explanation: {type: String, required: true},
-    createdBy: {type: Schema.Types.ObjectId, required: true},
-    createdAt: Number,
-    updatedAt: Number,
-  },{
-    timestamps: { currentTime: () => Date.now() }
-  });
+  const productSchema = new Schema(
+    {
+      title: { type: String, required: true },
+      content: { type: String, required: true },
+      featurePicture: { type: String },
+      distiPicture: { type: String },
+      category: { type: String },
+      price: { type: Number },
+      tagIDs: [Schema.Types.ObjectId],
+      digitalItem: { type: String },
+      disclaimer: { type: String },
+      createdBy: { type: Schema.Types.ObjectId, required: true },
+      createdAt: Number,
+      updatedAt: Number,
+    },
+    {
+      timestamps: { currentTime: () => Date.now() },
+    }
+  );
 
-  const attachmentSchema = new Schema({
-    base64: {type: String, required: true},
-    type: {type: String, required: true, enum: ['image']},
-    createdBy: {type: Schema.Types.ObjectId, required: true},
-    createdAt: Number,
-    updatedAt: Number,
-  },{
-    timestamps: { currentTime: () => Date.now() }
-  });
+  const orderSchema = new Schema(
+    {
+      totalAmount: { type: Number, required: true },
+      products: { type: Array, required: true },
+      deliveryDate: Number,
+      deliveryAddress: { type: String },
+      payment: { type: String },
+      payfastRef: { type: String },
+      status: { type: String },
+      createdBy: { type: Schema.Types.ObjectId, required: true },
+      createdAt: Number,
+      updatedAt: Number,
+    },
+    {
+      timestamps: { currentTime: () => Date.now() },
+    }
+  );
 
-  const productSchema = new Schema({
-    title: {type: String, required: true},
-    content: {type: String, required: true},
-    featurePicture: {type: String},
-    distiPicture: {type: String},
-    category: {type: String},
-    price: {type: Number},
-    tagIDs: [Schema.Types.ObjectId],
-    digitalItem: { type: String },
-    disclaimer: { type: String },
-    createdBy: {type: Schema.Types.ObjectId, required: true},
-    createdAt: Number,
-    updatedAt: Number,
-  },{
-    timestamps: { currentTime: () => Date.now() }
-  });
+  const tagSchema = new Schema(
+    {
+      name: { type: String, required: true },
+      type: { type: String, required: true },
+      createdBy: { type: Schema.Types.ObjectId, required: true },
+      createdAt: Number,
+      updatedAt: Number,
+    },
+    {
+      timestamps: { currentTime: () => Date.now() },
+    }
+  );
 
-  const orderSchema = new Schema({
-    totalAmount: {type: Number, required: true},
-    products: {type: Array, required: true},
-    deliveryDate: Number,
-    deliveryAddress: {type: String},
-    payment: {type: String},
-    payfastRef: {type: String},
-    status: { type: String },
-    createdBy: {type: Schema.Types.ObjectId, required: true},
-    createdAt: Number,
-    updatedAt: Number,
-  },{
-    timestamps: { currentTime: () => Date.now() }
-  });
+  const User = mongoose.model("User", userSchema);
+  const Document = mongoose.model("Document", documentSchema);
+  const Category = mongoose.model("Cateogry", categorySchema);
+  const Product = mongoose.model("Product", productSchema);
+  const Order = mongoose.model("Order", orderSchema);
+  const Tag = mongoose.model("Tag", tagSchema);
 
-  const tagSchema = new Schema({
-    name: { type: String, required: true },
-    type: { type: String, required: true },
-    createdBy: { type: Schema.Types.ObjectId, required: true },
-    createdAt: Number,
-    updatedAt: Number,
-  },{
-    timestamps: { currentTime: () => Date.now() }
+  const APP_DEFAULT_ADMIN_EMAIL =
+    process.env.APP_DEFAULT_ADMIN_EMAIL || "devlinpadayachee@gmail.com";
+  const APP_DEFAULT_ADMIN_PASSWORD =
+    process.env.APP_DEFAULT_ADMIN_PASSWORD || "Sepiroth6043@";
+  const defaultAdminUser = await User.findOne({
+    email: APP_DEFAULT_ADMIN_EMAIL,
   });
-
-  const xpressDoxReturnSchema = new Schema({
-    order: { type: Schema.Types.ObjectId, required: true },
-    product: { type: Schema.Types.ObjectId, required: true },
-    data: { type: Object },
-    createdAt: Number,
-    updatedAt: Number,
-  },{
-    timestamps: { currentTime: () => Date.now() }
-  });
-  
-  const User = mongoose.model('User', userSchema);
-  const Post = mongoose.model('Post', postSchema);
-  const Ticket = mongoose.model('Ticket', ticketSchema);
-  const Branch = mongoose.model('Branch', branchSchema);
-  const Reason = mongoose.model('Reason', reasonSchema);
-  const Attachment = mongoose.model('Attachment', attachmentSchema);
-  const Product = mongoose.model('Product', productSchema);
-  const Order = mongoose.model('Order', orderSchema);
-  const Tag = mongoose.model('Tag', tagSchema);
-  const XpressDoxReturn = mongoose.model('XpressDoxReturn', xpressDoxReturnSchema);
- 
-  const APP_DEFAULT_ADMIN_EMAIL = process.env.APP_DEFAULT_ADMIN_EMAIL || 'devlinpadayachee@gmail.com';
-  const APP_DEFAULT_ADMIN_PASSWORD= process.env.APP_DEFAULT_ADMIN_PASSWORD || 'Sepiroth6043@';
-  const defaultAdminUser = await User.findOne({email: APP_DEFAULT_ADMIN_EMAIL});
   if (!defaultAdminUser && isEmail.validate(APP_DEFAULT_ADMIN_EMAIL)) {
-    console.log('Default admin user does not exist, creating one now');
+    console.log("Default admin user does not exist, creating one now");
     const password = await this.getPasswordHash(APP_DEFAULT_ADMIN_PASSWORD);
     const adminUser = await User.create({
       password,
-      firstName: 'nla',
-      lastName: 'admin',
-      idNumber: '8512315344083',
-      fullAddress: '1 Sjampanje Street, Wilgeheuwel',
+      firstName: "vandeventers",
+      lastName: "admin",
+      idNumber: "8512315344083",
+      fullAddress: "1 Sjampanje Street, Wilgeheuwel",
       email: APP_DEFAULT_ADMIN_EMAIL,
-      role: 'admin'
+      role: "admin",
     });
     if (adminUser) {
-      console.log('Admin user created:', APP_DEFAULT_ADMIN_EMAIL)
+      console.log("Admin user created:", APP_DEFAULT_ADMIN_EMAIL);
     } else {
-      console.log('An error occured when trying to create the default admin user');
+      console.log(
+        "An error occured when trying to create the default admin user"
+      );
     }
   } else {
-    console.log('Skipped admin creation')
+    console.log("Skipped admin creation");
   }
-  return { User, Post, Ticket, Reason, Branch, Attachment, Product, Order, Tag, XpressDoxReturn };
+  return {
+    User,
+    Document,
+    Category,
+    Product,
+    Order,
+    Tag,
+  };
 };
 
 module.exports.createFirebaseInstance = async () => {
-  
   firebaseAdmin.initializeApp({
     credential: firebaseAdmin.credential.cert(firebaseServiceAccount),
     databaseURL: process.env.APP_FIREBASE_DB,
-    storageBucket: process.env.APP_FIREBASE_STORAGE_BUCKET
+    storageBucket: process.env.APP_FIREBASE_STORAGE_BUCKET,
   });
   var defaultBucket = firebaseAdmin.storage().bucket();
-  return { firebaseAdmin, defaultBucket }  
+  return { firebaseAdmin, defaultBucket };
 };
 
 module.exports.getPasswordHash = (password) => {
   return new Promise((resolve, reject) => {
-    bcrypt.hash(password, 10, function(err, hash) {
+    bcrypt.hash(password, 10, function (err, hash) {
       resolve(hash);
     });
-  })
+  });
 };
 
-module.exports.getJWT = ( user ) => {
+module.exports.getJWT = (user) => {
   return new Promise((resolve, reject) => {
     user = user.toJSON();
     user.id = user._id;
     delete user._id;
-    const token = jwt.sign(user, 'nla_jwt_secret'); //Using toJson because user is a mongoose object
+    const token = jwt.sign(user, "vandeventers_jwt_secret"); //Using toJson because user is a mongoose object
     resolve(token);
-  })
+  });
 };
 
 module.exports.verifyToken = (token) => {
   return new Promise((resolve, reject) => {
     try {
       if (token) {
-        resolve(jwt.verify(token, 'nla_jwt_secret'));
+        resolve(jwt.verify(token, "vandeventers_jwt_secret"));
       }
       resolve(null);
     } catch (err) {
       resolve(null);
     }
-  })
+  });
 };
 
 module.exports.createMailerQueueInstance = async () => {
   try {
     var mailerQueue;
-    if (process.env.NODE_ENV === 'production' && process.env.REDIS_URL){
-      mailerQueue = new Queue('mailer-queue', process.env.REDIS_URL);
+    if (process.env.NODE_ENV === "production" && process.env.REDIS_URL) {
+      mailerQueue = new Queue("mailer-queue", process.env.REDIS_URL);
     } else {
-      mailerQueue = new Queue('mailer-queue', {redis: {port: parseInt(process.env.APP_MAILER_QUEUE_REDIS_PORT) || 6379, host: process.env.APP_MAILER_QUEUE_REDIS_URL || '127.0.0.1'}});
+      mailerQueue = new Queue("mailer-queue", {
+        redis: {
+          port: parseInt(process.env.APP_MAILER_QUEUE_REDIS_PORT) || 6379,
+          host: process.env.APP_MAILER_QUEUE_REDIS_URL || "127.0.0.1",
+        },
+      });
     }
     mailerQueue.process(async (job) => {
       job.progress(0);
-      const {data: { to, subject, html, filename = undefined }} = job;
+      const {
+        data: { to, subject, html, filename = undefined },
+      } = job;
       job.progress(20);
       let attachments = [];
       if (filename) {
         job.progress(30);
         const buffer = getPDFBuffer(html);
-        attachments = buffer ? [{filename, content: buffer}] : [];
+        attachments = buffer ? [{ filename, content: buffer }] : [];
         job.progress(40);
       }
       try {
         job.progress(50);
         const mailResult = await sendMail(to, subject, html, attachments);
         job.progress(100);
-        return mailResult
-      } catch(error) {
+        return mailResult;
+      } catch (error) {
         job.progress(75);
         throw new Error(error);
       }
     });
-    mailerQueue.on('completed', (job, result) => {
+    mailerQueue.on("completed", (job, result) => {
       console.log(`Mailer job completed with result ${result}`);
     });
     return { mailerQueue };
-  } catch(error) {
-    if (process.env.NODE_ENV === 'production' && process.env.REDIS_URL){
-      console.log(`Failed to connect to Redis mailer queue on ${process.env.REDIS_URL}`);
-    }
-    else {
-      console.log(`Failed to connect to Redis mailer queue on ${process.env.APP_MAILER_QUEUE_REDIS_URL || '127.0.0.1'}`);
+  } catch (error) {
+    if (process.env.NODE_ENV === "production" && process.env.REDIS_URL) {
+      console.log(
+        `Failed to connect to Redis mailer queue on ${process.env.REDIS_URL}`
+      );
+    } else {
+      console.log(
+        `Failed to connect to Redis mailer queue on ${
+          process.env.APP_MAILER_QUEUE_REDIS_URL || "127.0.0.1"
+        }`
+      );
     }
   }
 };
 
-function getPDFBuffer (html) {
-  let options = { 
-    format: 'A4', 
-    orientation: 'portrait', 
-    type: 'pdf', 
-    timeout: '100000', 
-    width: "930px", 
-    height: "1316px"
-  }
+function getPDFBuffer(html) {
+  let options = {
+    format: "A4",
+    orientation: "portrait",
+    type: "pdf",
+    timeout: "100000",
+    width: "930px",
+    height: "1316px",
+  };
   pdf.create(html, options).toBuffer((error, buffer) => {
     if (error) {
       return undefined;
@@ -328,84 +321,81 @@ function getPDFBuffer (html) {
   });
 }
 
-function sendMail (to, subject, html, attachments) {
+function sendMail(to, subject, html, attachments) {
   return new Promise((resolve, reject) => {
-    console.log('Sending mail', { to, subject, html, attachments });
+    console.log("Sending mail", { to, subject, html, attachments });
     console.log({
       host: process.env.APP_MAILER_SMTP,
       port: parseInt(process.env.APP_MAILER_PORT),
-      secure: process.env.APP_MAILER_SECURE && process.env.APP_MAILER_SECURE === 'true' ? true : false,
+      secure:
+        process.env.APP_MAILER_SECURE &&
+        process.env.APP_MAILER_SECURE === "true"
+          ? true
+          : false,
       auth: {
         user: process.env.APP_MAILER_USERNAME,
-        pass: process.env.APP_MAILER_PASSWORD
-      }
+        pass: process.env.APP_MAILER_PASSWORD,
+      },
     });
     let transporter = nodemailer.createTransport({
       host: process.env.APP_MAILER_SMTP,
       port: parseInt(process.env.APP_MAILER_PORT),
-      secure: process.env.APP_MAILER_SECURE && process.env.APP_MAILER_SECURE === 'true' ? true : false,
+      secure:
+        process.env.APP_MAILER_SECURE &&
+        process.env.APP_MAILER_SECURE === "true"
+          ? true
+          : false,
       auth: {
         user: process.env.APP_MAILER_USERNAME,
-        pass: process.env.APP_MAILER_PASSWORD
-      }
+        pass: process.env.APP_MAILER_PASSWORD,
+      },
     });
     let mailOptions = {
       from: process.env.APP_MAILER_FROM,
       to,
       subject,
       html,
-      attachments
+      attachments,
     };
     transporter.sendMail(mailOptions, (error, info) => {
-      if(error) {
-        return reject(`An error occurred while tring to send mail to ${to}: ${error.message}`);
+      if (error) {
+        return reject(
+          `An error occurred while tring to send mail to ${to}: ${error.message}`
+        );
       }
       return resolve(`Mail sent: ${JSON.stringify(info)}`);
     });
-  })
+  });
 }
 
 module.exports.getArenaConfig = () => {
-  const arenaConfig = Arena({
-    queues: [
-      {
-        name: "mailer-queue",
-        hostId: "mailers",
-        redis: {
-          port: parseInt(process.env.APP_MAILER_QUEUE_REDIS_PORT) || 6379,
-          host: process.env.APP_MAILER_QUEUE_REDIS_URL,
+  const arenaConfig = Arena(
+    {
+      queues: [
+        {
+          name: "mailer-queue",
+          hostId: "mailers",
+          redis: {
+            port: parseInt(process.env.APP_MAILER_QUEUE_REDIS_PORT) || 6379,
+            host: process.env.APP_MAILER_QUEUE_REDIS_URL,
+          },
         },
-      },
-    ],
-  },
-  {
-    basePath: '/queues',
-    disableListen: true
-  });
+      ],
+    },
+    {
+      basePath: "/queues",
+      disableListen: true,
+    }
+  );
   return arenaConfig;
 };
 
-module.exports.sanitizeXpressDoxXML = (data) => {
-  return new Promise((resolve, reject) => {
-    try {
-      if (data) {
-        var jsonFromXpressdoxReturn = JSON.parse(convert.xml2json(data, { ignoreComment: true, ignoreAttributes: true, compact: true, spaces: 2 }));
-        resolve(jsonFromXpressdoxReturn);
-      }
-      resolve(null);
-    } catch (err) {
-      resolve(null);
-    }
-  })
-};
-
 module.exports.getUserToUserMailTemplate = (toUser, fromUser, message) => {
-
-return `<!doctype html>
+  return `<!doctype html>
   <html>
     <head>
         <meta charset="utf-8">
-        <title>NLA Message</title>
+        <title>vandeventers Message</title>
         
         <style>
         .message-box {
@@ -510,7 +500,7 @@ return `<!doctype html>
                         <table>
                             <tr>
                                 <td class="title">
-                                    <img src="https://nla-graphql-client.herokuapp.com/img/logo.ff72e2e1.png" style="width:100%; max-width:100px;">
+                                    <img src="https://vandeventers-graphql-client.herokuapp.com/img/logo.ff72e2e1.png" style="width:100%; max-width:100px;">
                                 </td>
                             </tr>
                         </table>
@@ -538,7 +528,7 @@ return `<!doctype html>
                         <table>
                             <tr>
                                 <td>
-                                  You can get back to me at <a href="${process.env.APP_CLIENT_URL}">NLA</a><br> 
+                                  You can get back to me at <a href="${process.env.APP_CLIENT_URL}">vandeventers</a><br> 
                                   or contact me directly at ${fromUser.email}
                                 </td>
                             </tr>
@@ -548,18 +538,18 @@ return `<!doctype html>
             </table>
         </div>
     </body>
-  </html>`
+  </html>`;
 };
 module.exports.getShopEnquiryTemplate = (fromUser, items) => {
-  var itemHTML = '';
-  _.forEach(items, function(item, index) {
+  var itemHTML = "";
+  _.forEach(items, function (item, index) {
     itemHTML += `<span>${index}: ${item}</span><br>`;
   });
   return `<!doctype html>
     <html>
       <head>
           <meta charset="utf-8">
-          <title>NLA Shop Enquiry</title>
+          <title>vandeventers Shop Enquiry</title>
           
           <style>
           .message-box {
@@ -678,15 +668,15 @@ module.exports.getShopEnquiryTemplate = (fromUser, items) => {
               </table>
           </div>
       </body>
-    </html>`
-  };
+    </html>`;
+};
 module.exports.getUserOnboardingMailTemplate = (user) => {
   return `<!doctype html>
   <html>
     <head>
       <meta name="viewport" content="width=device-width">
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-      <title>NLA Customer Email </title>
+      <title>vandeventers Customer Email </title>
       <style>
       /* -------------------------------------
           INLINED WITH htmlemail.io/inline
@@ -785,7 +775,7 @@ module.exports.getUserOnboardingMailTemplate = (user) => {
             <div class="content" style="box-sizing: border-box; display: block; Margin: 0 auto; max-width: 580px; padding: 10px;">
   
               <!-- START CENTERED WHITE CONTAINER -->
-              <span class="preheader" style="color: transparent; display: none; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;">NLA Potential Customer</span>
+              <span class="preheader" style="color: transparent; display: none; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;">vandeventers Potential Customer</span>
               <table class="main" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #ffffff; border-radius: 3px;">
   
                 <!-- START MAIN CONTENT AREA -->
@@ -794,7 +784,7 @@ module.exports.getUserOnboardingMailTemplate = (user) => {
                     <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
                       <tr>
                         <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
-                          <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Hi NLA Team,</p>
+                          <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Hi vandeventers Team,</p>
                           <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">You have a new customer ${user.email}</p>
                           <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;">
                             <tbody>
@@ -809,10 +799,10 @@ module.exports.getUserOnboardingMailTemplate = (user) => {
                               </tr>
                             </tbody>
                           </table>
-                          <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Login to the NLA Admin Portal to view the customer</p>
+                          <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Login to the vandeventers Admin Portal to view the customer</p>
                           <tbody>
                                   <tr>
-                                      <td style="font-family: sans-serif; font-size: 14px;text-align: center; vertical-align: top; background-color: #000000; border-radius: 5px; text-align: center;"> <a href="https://nla-graphql-client.herokuapp.com/#/" target="_blank" style="display: inline-block; color: #ffffff; background-color: #000000; border: solid 1px #000000; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #000000;">Take me to the NLA Admin Portal</a> </td>
+                                      <td style="font-family: sans-serif; font-size: 14px;text-align: center; vertical-align: top; background-color: #000000; border-radius: 5px; text-align: center;"> <a href="https://vandeventers-graphql-client.herokuapp.com/#/" target="_blank" style="display: inline-block; color: #ffffff; background-color: #000000; border: solid 1px #000000; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #000000;">Take me to the vandeventers Admin Portal</a> </td>
                                   </tr>
                                   
                               </tbody>
@@ -831,7 +821,7 @@ module.exports.getUserOnboardingMailTemplate = (user) => {
                 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
                   <tr>
                     <td class="content-block" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;">
-                      <span class="apple-link" style="color: #999999; font-size: 12px; text-align: center;">NLA Africa (Pty) Ltd ,140a Kelvin Drive, Morningside Manor, 2196</span>
+                      <span class="apple-link" style="color: #999999; font-size: 12px; text-align: center;">vandeventers Africa (Pty) Ltd ,140a Kelvin Drive, Morningside Manor, 2196</span>
                       
                     </td>
                   </tr>
@@ -847,9 +837,5 @@ module.exports.getUserOnboardingMailTemplate = (user) => {
         </tr>
       </table>
     </body>
-  </html>`
+  </html>`;
 };
-
-
-
-

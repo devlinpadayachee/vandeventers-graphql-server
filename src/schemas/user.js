@@ -9,7 +9,7 @@ const typeDefs = gql`
     firstName: String!
     lastName: String!
     idNumber: String
-    fullAddress: String!
+    fullAddress: String
     telNumber: String
     title: String
     industry: String

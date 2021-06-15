@@ -111,35 +111,20 @@ module.exports.createMongoInstance = async () => {
     }
   );
 
-  const productSchema = new Schema(
+  const inventoryItemSchema = new Schema(
     {
-      title: { type: String, required: true },
-      content: { type: String, required: true },
-      featurePicture: { type: String },
-      distiPicture: { type: String },
-      category: { type: String },
-      price: { type: Number },
-      tagIDs: [Schema.Types.ObjectId],
-      digitalItem: { type: String },
-      disclaimer: { type: String },
-      createdBy: { type: Schema.Types.ObjectId, required: true },
-      createdAt: Number,
-      updatedAt: Number,
-    },
-    {
-      timestamps: { currentTime: () => Date.now() },
-    }
-  );
-
-  const orderSchema = new Schema(
-    {
-      totalAmount: { type: Number, required: true },
-      products: { type: Array, required: true },
-      deliveryDate: Number,
-      deliveryAddress: { type: String },
-      payment: { type: String },
-      payfastRef: { type: String },
-      status: { type: String },
+      serial: { type: String, required: true },
+      type: { type: String, required: true },
+      user: { type: Schema.Types.ObjectId, required: true },
+      supplierName: { type: String },
+      supplierContactNumber: { type: String },
+      installerName: { type: String },
+      installerContactNumber: { type: String },
+      notes: { type: String },
+      damage: { type: String },
+      installationImage: { type: String },
+      invoiceDate: Number,
+      invoiceReference: { type: String },
       createdBy: { type: Schema.Types.ObjectId, required: true },
       createdAt: Number,
       updatedAt: Number,
@@ -164,9 +149,8 @@ module.exports.createMongoInstance = async () => {
 
   const User = mongoose.model("User", userSchema);
   const Document = mongoose.model("Document", documentSchema);
-  const Category = mongoose.model("Cateogry", categorySchema);
-  const Product = mongoose.model("Product", productSchema);
-  const Order = mongoose.model("Order", orderSchema);
+  const Category = mongoose.model("Category", categorySchema);
+  const InventoryItem = mongoose.model("InventoryItem", inventoryItemSchema);
   const Tag = mongoose.model("Tag", tagSchema);
 
   const APP_DEFAULT_ADMIN_EMAIL =
@@ -202,8 +186,7 @@ module.exports.createMongoInstance = async () => {
     User,
     Document,
     Category,
-    Product,
-    Order,
+    InventoryItem,
     Tag,
   };
 };

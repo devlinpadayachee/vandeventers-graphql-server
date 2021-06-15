@@ -12,8 +12,7 @@ class mongoAPI extends DataSource {
     this.User = mongoInstance.User;
     this.Document = mongoInstance.Document;
     this.Category = mongoInstance.Category;
-    this.Product = mongoInstance.Product;
-    this.Order = mongoInstance.Order;
+    this.InventoryItem = mongoInstance.InventoryItem;
     this.Tag = mongoInstance.Tag;
   }
 
@@ -250,24 +249,24 @@ class mongoAPI extends DataSource {
     }
   }
 
-  //Products
-  async product(id) {
+  //Inventory Items
+  async inventoryItem(id) {
     try {
-      const product = await this.Product.findOne({ _id: id });
-      return product ? product : null;
+      const inventoryItem = await this.InventoryItem.findOne({ _id: id });
+      return inventoryItem ? inventoryItem : null;
     } catch (e) {
-      console.log("Oops Something went wrong with finding the product");
+      console.log("Oops Something went wrong with finding the inventoryItem");
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
     }
   }
 
-  async products(limit = 10, skip = 0, query = {}) {
+  async inventoryItems(limit = 10, skip = 0, query = {}) {
     try {
-      const count = await this.Product.where(query).countDocuments();
+      const count = await this.InventoryItem.where(query).countDocuments();
       if (skip >= count) {
         skip = 0;
       }
-      const records = await this.Product.find(query)
+      const records = await this.InventoryItem.find(query)
         .limit(limit)
         .skip(skip)
         .sort({ createdAt: -1 });
@@ -280,108 +279,41 @@ class mongoAPI extends DataSource {
     }
   }
 
-  async createProduct(args) {
+  async createInventoryItem(args) {
     try {
-      const product = await this.Product.create(args);
-      return product ? product : null;
+      const inventoryItem = await this.InventoryItem.create(args);
+      return inventoryItem ? inventoryItem : null;
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
     }
   }
 
-  async updateProduct(args) {
+  async updateInventoryItem(args) {
     try {
       const id = args.id;
-      const updatedProduct = await this.Product.findOneAndUpdate(
+      const updatedInventoryItem = await this.InventoryItem.findOneAndUpdate(
         { _id: id },
         args,
         { new: true }
       );
-      return updatedProduct
-        ? { id, updated: true, product: updatedProduct }
-        : { id, updated: false, product: null };
+      return updatedInventoryItem
+        ? { id, updated: true, inventoryItem: updatedInventoryItem }
+        : { id, updated: false, inventoryItem: null };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
     }
   }
 
-  async deleteProduct(id) {
+  async deleteInventoryItem(id) {
     try {
-      const deletedProduct = await this.Product.deleteOne({ _id: id });
-      return deletedProduct.deletedCount > 0
-        ? { id, deleted: true, product: deletedProduct }
-        : { id, deleted: false, product: null };
-    } catch (e) {
-      console.log("Oops Something went wrong", e);
-      throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
-    }
-  }
-
-  //Orders
-  async order(id) {
-    try {
-      const order = await this.Order.findOne({ _id: id });
-      return order ? order : null;
-    } catch (e) {
-      console.log("Oops Something went wrong with finding the order");
-      throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
-    }
-  }
-
-  async orders(limit = 10, skip = 0, query = {}) {
-    try {
-      const count = await this.Order.where(query).countDocuments();
-      if (skip >= count) {
-        skip = 0;
-      }
-      const records = await this.Order.find(query)
-        .limit(limit)
-        .skip(skip)
-        .sort({ createdAt: -1 });
-      return records.length > 0
-        ? { records, count }
-        : { records: [], count: 0 };
-    } catch (e) {
-      console.log("Oops Something went wrong", e);
-      throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
-    }
-  }
-
-  async createOrder(args) {
-    try {
-      const order = await this.Order.create(args);
-      return order ? order : null;
-    } catch (e) {
-      console.log("Oops Something went wrong", e);
-      throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
-    }
-  }
-
-  async updateOrder(args) {
-    try {
-      const id = args.id;
-      const updatedOrder = await this.Order.findOneAndUpdate(
-        { _id: id },
-        args,
-        { new: true }
-      );
-      return updatedOrder
-        ? { id, updated: true, order: updatedOrder }
-        : { id, updated: false, order: null };
-    } catch (e) {
-      console.log("Oops Something went wrong", e);
-      throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
-    }
-  }
-
-  async deleteOrder(id) {
-    try {
-      const deletedOrder = await this.Order.deleteOne({ _id: id });
-      return deletedOrder.deletedCount > 0
-        ? { id, deleted: true, order: deletedOrder }
-        : { id, deleted: false, order: null };
+      const deletedInventoryItem = await this.InventoryItem.deleteOne({
+        _id: id,
+      });
+      return deletedInventoryItem.deletedCount > 0
+        ? { id, deleted: true, inventoryItem: deletedInventoryItem }
+        : { id, deleted: false, inventoryItem: null };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});

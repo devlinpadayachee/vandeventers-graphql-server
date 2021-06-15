@@ -12,15 +12,13 @@ const BaseTypeDef = require("./schemas/base");
 const UserTypeDef = require("./schemas/user");
 const DocumentTypeDef = require("./schemas/document");
 const CategoryTypeDef = require("./schemas/category");
-const ProductTypeDef = require("./schemas/product");
-const OrderTypeDef = require("./schemas/order");
+const InventoryItemTypeDef = require("./schemas/inventoryItem");
 const TagTypeDef = require("./schemas/tag");
 const BaseResolver = require("./resolvers/base");
 const UserResolver = require("./resolvers/user");
 const DocumentResolver = require("./resolvers/document");
 const CategoryResolver = require("./resolvers/category");
-const ProductResolver = require("./resolvers/product");
-const OrderResolver = require("./resolvers/order");
+const InventoryItemResolver = require("./resolvers/inventoryItem");
 const TagResolver = require("./resolvers/tag");
 const permissions = require("./permissions");
 
@@ -54,8 +52,7 @@ const schema = applyMiddleware(
       UserTypeDef,
       DocumentTypeDef,
       CategoryTypeDef,
-      ProductTypeDef,
-      OrderTypeDef,
+      InventoryItemTypeDef,
       TagTypeDef,
     ],
     resolvers: _.merge(
@@ -63,8 +60,7 @@ const schema = applyMiddleware(
       UserResolver,
       DocumentResolver,
       CategoryResolver,
-      ProductResolver,
-      OrderResolver,
+      InventoryItemResolver,
       TagResolver
     ),
   }),

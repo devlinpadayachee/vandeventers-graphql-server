@@ -134,6 +134,19 @@ module.exports.createMongoInstance = async () => {
     }
   );
 
+  const calculatorSchema = new Schema(
+    {
+      name: { type: String, required: true },
+      settings: { type: Object, default: {} },
+      createdBy: { type: Schema.Types.ObjectId, required: true },
+      createdAt: Number,
+      updatedAt: Number,
+    },
+    {
+      timestamps: { currentTime: () => Date.now() },
+    }
+  );
+
   const tagSchema = new Schema(
     {
       name: { type: String, required: true },
@@ -151,6 +164,7 @@ module.exports.createMongoInstance = async () => {
   const Document = mongoose.model("Document", documentSchema);
   const Category = mongoose.model("Category", categorySchema);
   const InventoryItem = mongoose.model("InventoryItem", inventoryItemSchema);
+  const Calculator = mongoose.model("Calculator", calculatorSchema);
   const Tag = mongoose.model("Tag", tagSchema);
 
   const APP_DEFAULT_ADMIN_EMAIL =
@@ -187,6 +201,7 @@ module.exports.createMongoInstance = async () => {
     Document,
     Category,
     InventoryItem,
+    Calculator,
     Tag,
   };
 };

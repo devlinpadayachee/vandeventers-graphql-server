@@ -13,6 +13,7 @@ class mongoAPI extends DataSource {
     this.Document = mongoInstance.Document;
     this.Category = mongoInstance.Category;
     this.InventoryItem = mongoInstance.InventoryItem;
+    this.Calculator = mongoInstance.Calculator;
     this.Tag = mongoInstance.Tag;
   }
 
@@ -314,6 +315,77 @@ class mongoAPI extends DataSource {
       return deletedInventoryItem.deletedCount > 0
         ? { id, deleted: true, inventoryItem: deletedInventoryItem }
         : { id, deleted: false, inventoryItem: null };
+    } catch (e) {
+      console.log("Oops Something went wrong", e);
+      throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
+    }
+  }
+
+  //Calculators
+  async calculator(id) {
+    try {
+      const calculator = await this.Calculator.findOne({ _id: id });
+      return calculator ? calculator : null;
+    } catch (e) {
+      console.log("Oops Something went wrong with finding the calculator");
+      throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
+    }
+  }
+
+  async calculators(limit = 10, skip = 0, query = {}) {
+    try {
+      const count = await this.Calculator.where(query).countDocuments();
+      if (skip >= count) {
+        skip = 0;
+      }
+      const records = await this.Calculator.find(query)
+        .limit(limit)
+        .skip(skip)
+        .sort({ createdAt: -1 });
+      return records.length > 0
+        ? { records, count }
+        : { records: [], count: 0 };
+    } catch (e) {
+      console.log("Oops Something went wrong", e);
+      throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
+    }
+  }
+
+  async createCalculator(args) {
+    try {
+      const calculator = await this.Calculator.create(args);
+      return calculator ? calculator : null;
+    } catch (e) {
+      console.log("Oops Something went wrong", e);
+      throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
+    }
+  }
+
+  async updateCalculator(args) {
+    try {
+      const id = args.id;
+      const updatedCalculator = await this.Calculator.findOneAndUpdate(
+        { _id: id },
+        args,
+        {
+          new: true,
+        }
+      );
+      return updatedCalculator
+        ? { id, updated: true, calculator: updatedCalculator }
+        : { id, updated: false, calculator: null };
+    } catch (e) {
+      console.log("Oops Something went wrong", e);
+      throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
+    }
+  }
+
+  async deleteCalculator(id) {
+    try {
+      const deletedCalculator = await this.Calculator.deleteOne({ _id: id });
+      return deletedCalculator.deletedCount > 0
+        ? { id, deleted: true, calculator: deletedCalculator }
+        : { id, deleted: false, calculator: null };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});

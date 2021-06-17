@@ -49,8 +49,8 @@ const typeDefs = gql`
     firstName: String!
     lastName: String!
     idNumber: String
-    fullAddress: String!
-    telNumber: String!
+    fullAddress: String
+    telNumber: String
     rating: Int
     email: String!
     bio: String

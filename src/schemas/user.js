@@ -39,7 +39,7 @@ const typeDefs = gql`
     sendUserToUserEmailMessage(to: ID!, from: ID!, message: String!): JSON!
     sendOTP(recipient: String!, message: String!): JSON!
     sendShopEnquiry(from: ID!, items: JSON!): JSON!
-    createUser(user: UserCreateInput): User!
+    createUser(user: UserCreateInput): LoginResponse!
     updateUser(user: UserUpdateInput): UserUpdatedResponse!
     deleteUser(id: ID!): UserDeletedResponse!
   }

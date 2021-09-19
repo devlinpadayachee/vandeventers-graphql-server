@@ -54,6 +54,7 @@ module.exports = {
       );
       if (!user) throw new UserInputError("Could not find user!");
       const resetToken = shortid.generate();
+      console.log("Found User");
       var constructedURL = `${process.env.APP_CLIENT_URL}/#/password-reset/${resetToken}`;
       const updated = await context.dataSources.mongoAPI.updateUser({
         id: user.id,
@@ -65,6 +66,7 @@ module.exports = {
         "Password Reset",
         populatedTemplate
       );
+      console.log("Initiated Reset Password Job", job);
       if (job) return job;
       throw new ApolloError(
         "Could not generate password reset link mailer",

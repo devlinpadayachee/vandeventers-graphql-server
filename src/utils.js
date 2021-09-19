@@ -260,22 +260,47 @@ module.exports.createMailerQueueInstance = async () => {
         },
       });
     }
+
+    function intervalFunc() {
+      try {
+        mailerQueue.clean(3600 * 1000 * 24, "completed");
+        mailerQueue.clean(3600 * 1000 * 24, "failed");
+      } catch (error) {
+        console.log(`Could not clean mailerQueue`);
+      }
+    }
+
+    if (mailerQueue) {
+      setInterval(intervalFunc, 1000 * 60);
+    }
+
     mailerQueue.process(async (job) => {
+      // console.log("processing job", job);
       job.progress(0);
       const {
-        data: { to, subject, html, filename = undefined },
+        data: { to, subject, html, filename, attachments },
       } = job;
       job.progress(20);
-      let attachments = [];
       if (filename) {
         job.progress(30);
         const buffer = getPDFBuffer(html);
-        attachments = buffer ? [{ filename, content: buffer }] : [];
+        if (buffer) {
+          attachments.push({ filename, content: buffer });
+        }
         job.progress(40);
       }
+      var mailResult = undefined;
       try {
         job.progress(50);
-        const mailResult = await sendMail(to, subject, html, attachments);
+        console.log("got passed 50");
+        try {
+          mailResult = await sendMail(to, subject, html, attachments);
+          console.log("mailResult came back", mailResult);
+        } catch (e) {
+          console.log("mailResult", mailResult);
+          console.log(e);
+        }
+
         job.progress(100);
         return mailResult;
       } catch (error) {
@@ -285,6 +310,14 @@ module.exports.createMailerQueueInstance = async () => {
     });
     mailerQueue.on("completed", (job, result) => {
       console.log(`Mailer job completed with result ${result}`);
+    });
+
+    mailerQueue.on("failed", function (job, err) {
+      console.log(err);
+    });
+
+    mailerQueue.on("error", function (error) {
+      console.log(error);
     });
     return { mailerQueue };
   } catch (error) {
@@ -321,7 +354,8 @@ function getPDFBuffer(html) {
 
 function sendMail(to, subject, html, attachments) {
   return new Promise((resolve, reject) => {
-    console.log("Sending mail", { to, subject, html, attachments });
+    console.log("Im definitely hitting the send mail function", to, subject);
+    // // console.log("Sending mail", { to, subject, html, attachments });
     console.log({
       host: process.env.APP_MAILER_SMTP,
       port: parseInt(process.env.APP_MAILER_PORT),
@@ -335,34 +369,43 @@ function sendMail(to, subject, html, attachments) {
         pass: process.env.APP_MAILER_PASSWORD,
       },
     });
-    let transporter = nodemailer.createTransport({
-      host: process.env.APP_MAILER_SMTP,
-      port: parseInt(process.env.APP_MAILER_PORT),
-      secure:
-        process.env.APP_MAILER_SECURE &&
-        process.env.APP_MAILER_SECURE === "true"
-          ? true
-          : false,
-      auth: {
-        user: process.env.APP_MAILER_USERNAME,
-        pass: process.env.APP_MAILER_PASSWORD,
-      },
-    });
-    let mailOptions = {
-      from: process.env.APP_MAILER_FROM,
-      to,
-      subject,
-      html,
-      attachments,
-    };
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        return reject(
-          `An error occurred while tring to send mail to ${to}: ${error.message}`
-        );
-      }
-      return resolve(`Mail sent: ${JSON.stringify(info)}`);
-    });
+    try {
+      let transporter = nodemailer.createTransport({
+        host: process.env.APP_MAILER_SMTP,
+        port: parseInt(process.env.APP_MAILER_PORT),
+        secure:
+          process.env.APP_MAILER_SECURE &&
+          process.env.APP_MAILER_SECURE === "true"
+            ? true
+            : false,
+        auth: {
+          user: process.env.APP_MAILER_USERNAME,
+          pass: process.env.APP_MAILER_PASSWORD,
+        },
+      });
+      let mailOptions = {
+        from: process.env.APP_MAILER_FROM,
+        to,
+        subject,
+        html,
+        attachments,
+      };
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(error, info);
+          return reject(
+            `An error occurred while tring to send mail to ${to}: ${error.message}`
+          );
+        }
+        transporter.close();
+        return resolve(`Mail sent: ${JSON.stringify(info)}`);
+      });
+    } catch (e) {
+      console.log(e);
+      return reject(
+        `An error occurred while tring to send mail to ${to}: ${e.message}`
+      );
+    }
   });
 }
 
@@ -394,7 +437,7 @@ module.exports.getUserToUserMailTemplate = (toUser, fromUser, message) => {
     <head>
         <meta charset="utf-8">
         <title>vandeventers Message</title>
-        
+
         <style>
         .message-box {
             max-width: 800px;
@@ -407,84 +450,84 @@ module.exports.getUserToUserMailTemplate = (toUser, fromUser, message) => {
             font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
             color: #555;
         }
-        
+
         .message-box table {
             width: 100%;
             line-height: inherit;
             text-align: left;
         }
-        
+
         .message-box table td {
             padding: 5px;
             vertical-align: top;
         }
-        
+
         .message-box table tr td:nth-child(2) {
             text-align: right;
         }
-        
+
         .message-box table tr.top table td {
             padding-bottom: 20px;
         }
-        
+
         .message-box table tr.top table td.title {
             font-size: 45px;
             line-height: 45px;
             color: #333;
         }
-        
+
         .message-box table tr.information table td {
             padding-bottom: 40px;
         }
-        
+
         .message-box table tr.heading td {
             background: #eee;
             border-bottom: 1px solid #ddd;
             font-weight: bold;
             padding: 30px;
         }
-        
+
         .message-box table tr.details td {
             padding-bottom: 20px;
         }
-        
+
         .message-box table tr.item td{
             border-bottom: 1px solid #eee;
         }
-        
+
         .message-box table tr.item.last td {
             border-bottom: none;
         }
-        
+
         .message-box table tr.total td:nth-child(2) {
             border-top: 2px solid #eee;
             font-weight: bold;
         }
-        
+
         @media only screen and (max-width: 600px) {
             .message-box table tr.top table td {
                 width: 100%;
                 display: block;
                 text-align: center;
             }
-            
+
             .message-box table tr.information table td {
                 width: 100%;
                 display: block;
                 text-align: center;
             }
         }
-        
+
         /** RTL **/
         .rtl {
             direction: rtl;
             font-family: Tahoma, 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
         }
-        
+
         .rtl table {
             text-align: right;
         }
-        
+
         .rtl table tr td:nth-child(2) {
             text-align: left;
         }
@@ -520,13 +563,13 @@ module.exports.getUserToUserMailTemplate = (toUser, fromUser, message) => {
                     <td>
                       ${message}
                     </td>
-                </tr>        
+                </tr>
                 <tr class="information">
                     <td colspan="2">
                         <table>
                             <tr>
                                 <td>
-                                  You can get back to me at <a href="${process.env.APP_CLIENT_URL}">vandeventers</a><br> 
+                                  You can get back to me at <a href="${process.env.APP_CLIENT_URL}">vandeventers</a><br>
                                   or contact me directly at ${fromUser.email}
                                 </td>
                             </tr>
@@ -548,7 +591,7 @@ module.exports.getShopEnquiryTemplate = (fromUser, items) => {
       <head>
           <meta charset="utf-8">
           <title>vandeventers Shop Enquiry</title>
-          
+
           <style>
           .message-box {
               max-width: 800px;
@@ -561,84 +604,84 @@ module.exports.getShopEnquiryTemplate = (fromUser, items) => {
               font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
               color: #555;
           }
-          
+
           .message-box table {
               width: 100%;
               line-height: inherit;
               text-align: left;
           }
-          
+
           .message-box table td {
               padding: 5px;
               vertical-align: top;
           }
-          
+
           .message-box table tr td:nth-child(2) {
               text-align: right;
           }
-          
+
           .message-box table tr.top table td {
               padding-bottom: 20px;
           }
-          
+
           .message-box table tr.top table td.title {
               font-size: 45px;
               line-height: 45px;
               color: #333;
           }
-          
+
           .message-box table tr.information table td {
               padding-bottom: 40px;
           }
-          
+
           .message-box table tr.heading td {
               background: #eee;
               border-bottom: 1px solid #ddd;
               font-weight: bold;
               padding: 30px;
           }
-          
+
           .message-box table tr.details td {
               padding-bottom: 20px;
           }
-          
+
           .message-box table tr.item td{
               border-bottom: 1px solid #eee;
           }
-          
+
           .message-box table tr.item.last td {
               border-bottom: none;
           }
-          
+
           .message-box table tr.total td:nth-child(2) {
               border-top: 2px solid #eee;
               font-weight: bold;
           }
-          
+
           @media only screen and (max-width: 600px) {
               .message-box table tr.top table td {
                   width: 100%;
                   display: block;
                   text-align: center;
               }
-              
+
               .message-box table tr.information table td {
                   width: 100%;
                   display: block;
                   text-align: center;
               }
           }
-          
+
           /** RTL **/
           .rtl {
               direction: rtl;
               font-family: Tahoma, 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
           }
-          
+
           .rtl table {
               text-align: right;
           }
-          
+
           .rtl table tr td:nth-child(2) {
               text-align: left;
           }
@@ -662,7 +705,7 @@ module.exports.getShopEnquiryTemplate = (fromUser, items) => {
                       <td>
                         ${itemHTML}
                       </td>
-                  </tr>        
+                  </tr>
               </table>
           </div>
       </body>
@@ -723,7 +766,7 @@ module.exports.getUserOnboardingMailTemplate = (user) => {
           width: auto !important;
         }
       }
-  
+
       /* -------------------------------------
           PRESERVE THESE STYLES IN THE HEAD
       ------------------------------------- */
@@ -771,11 +814,11 @@ module.exports.getUserOnboardingMailTemplate = (user) => {
           <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">&nbsp;</td>
           <td class="container" style="font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; Margin: 0 auto; max-width: 580px; padding: 10px; width: 580px;">
             <div class="content" style="box-sizing: border-box; display: block; Margin: 0 auto; max-width: 580px; padding: 10px;">
-  
+
               <!-- START CENTERED WHITE CONTAINER -->
               <span class="preheader" style="color: transparent; display: none; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;">vandeventers Potential Customer</span>
               <table class="main" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #ffffff; border-radius: 3px;">
-  
+
                 <!-- START MAIN CONTENT AREA -->
                 <tr>
                   <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 20px;">
@@ -789,9 +832,9 @@ module.exports.getUserOnboardingMailTemplate = (user) => {
                               <tr>
                                 <td align="left" style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;">
                                   <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;">
-                                      
-                                          
-                                      
+
+
+
                                   </table>
                                 </td>
                               </tr>
@@ -802,32 +845,32 @@ module.exports.getUserOnboardingMailTemplate = (user) => {
                                   <tr>
                                       <td style="font-family: sans-serif; font-size: 14px;text-align: center; vertical-align: top; background-color: #000000; border-radius: 5px; text-align: center;"> <a href="https://vandeventers-graphql-client.herokuapp.com/#/" target="_blank" style="display: inline-block; color: #ffffff; background-color: #000000; border: solid 1px #000000; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #000000;">Take me to the vandeventers Admin Portal</a> </td>
                                   </tr>
-                                  
+
                               </tbody>
-                          
+
                         </td>
                       </tr>
                     </table>
                   </td>
                 </tr>
-  
+
               <!-- END MAIN CONTENT AREA -->
               </table>
-  
+
               <!-- START FOOTER -->
               <div class="footer" style="clear: both; Margin-top: 10px; text-align: center; width: 100%;">
                 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
                   <tr>
                     <td class="content-block" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;">
                       <span class="apple-link" style="color: #999999; font-size: 12px; text-align: center;">vandeventers Africa (Pty) Ltd ,140a Kelvin Drive, Morningside Manor, 2196</span>
-                      
+
                     </td>
                   </tr>
-                  
+
                 </table>
               </div>
               <!-- END FOOTER -->
-  
+
             <!-- END CENTERED WHITE CONTAINER -->
             </div>
           </td>

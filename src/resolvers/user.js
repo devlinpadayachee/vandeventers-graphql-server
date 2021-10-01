@@ -153,6 +153,21 @@ module.exports = {
         });
       }
       args.user.password = await getPasswordHash(args.user.password);
+      if (args?.user?.profilePicture) {
+        console.log("Attempting to get fileUrl from FireBase");
+        let mimeType = args?.user?.profilePicture.match(
+          /[^:]\w+\/[\w-+\d.]+(?=;|,)/
+        )[0];
+        const fileUrl = await context.dataSources.firebaseAPI.uploadFile(
+          mime.extension(mimeType),
+          `user-profile-pictures/${args.user.email}`,
+          { working: true },
+          mimeType,
+          args?.user?.profilePicture
+        );
+        console.log(fileUrl);
+        args.user.profilePicture = fileUrl;
+      }
       const user = await context.dataSources.mongoAPI.createUser(args.user);
       if (user) {
         const populatedTemplate = await getUserOnboardingMailTemplate(user);
@@ -172,14 +187,20 @@ module.exports = {
       );
     },
     updateUser: async (parent, args, context, info) => {
-      if (args?.user?.profilePicture) {
+      console.log(args);
+      const user = await context.dataSources.mongoAPI.user(args.user.id);
+      console.log("updating", user);
+      if (
+        args?.user?.profilePicture &&
+        args?.user?.profilePicture != user.profilePicture
+      ) {
         console.log("Attempting to get fileUrl from FireBase");
         let mimeType = args?.user?.profilePicture.match(
           /[^:]\w+\/[\w-+\d.]+(?=;|,)/
         )[0];
         const fileUrl = await context.dataSources.firebaseAPI.uploadFile(
           mime.extension(mimeType),
-          `profile-pictures/${args.user.id}`,
+          `user-profile-pictures/${args.user.email}`,
           { working: true },
           mimeType,
           args?.user?.profilePicture

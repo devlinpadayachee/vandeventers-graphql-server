@@ -72,6 +72,7 @@ module.exports.createMongoInstance = async () => {
       profilePicture: { type: String },
       loginCounter: Number,
       resetToken: { type: String },
+      showAsContact: { type: Boolean, default: false },
       createdAt: Number,
       updatedAt: Number,
     },

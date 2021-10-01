@@ -22,6 +22,7 @@ const typeDefs = gql`
     profilePicture: String
     loginCounter: Int
     resetToken: String
+    showAsContact: Boolean
     createdAt: Float!
     updatedAt: Float!
   }
@@ -81,6 +82,7 @@ const typeDefs = gql`
     profilePicture: String
     loginCounter: Int
     resetToken: String
+    showAsContact: Boolean
   }
 
   type UsersResponse {

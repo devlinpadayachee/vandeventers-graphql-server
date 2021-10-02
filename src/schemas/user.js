@@ -23,6 +23,7 @@ const typeDefs = gql`
     loginCounter: Int
     resetToken: String
     showAsContact: Boolean
+    jobTitle: String
     createdAt: Float!
     updatedAt: Float!
   }
@@ -83,6 +84,7 @@ const typeDefs = gql`
     loginCounter: Int
     resetToken: String
     showAsContact: Boolean
+    jobTitle: String
   }
 
   type UsersResponse {

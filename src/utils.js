@@ -73,6 +73,7 @@ module.exports.createMongoInstance = async () => {
       loginCounter: Number,
       resetToken: { type: String },
       showAsContact: { type: Boolean, default: false },
+      jobTitle: { type: String },
       createdAt: Number,
       updatedAt: Number,
     },

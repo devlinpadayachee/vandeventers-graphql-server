@@ -32,10 +32,7 @@ module.exports.paginateResults = ({
   return cursorIndex >= 0
     ? cursorIndex === results.length - 1 // don't let us overflow
       ? []
-      : results.slice(
-          cursorIndex + 1,
-          Math.min(results.length, cursorIndex + 1 + pageSize)
-        )
+      : results.slice(cursorIndex + 1, Math.min(results.length, cursorIndex + 1 + pageSize))
     : results.slice(0, pageSize);
 };
 
@@ -87,7 +84,7 @@ module.exports.createMongoInstance = async () => {
       name: { type: String, required: true },
       user: { type: Schema.Types.ObjectId, required: true },
       docClass: { type: String },
-      category: { type: Schema.Types.ObjectId, required: true },
+      category: { type: Schema.Types.ObjectId },
       documentLink: { type: String },
       documentFileName: { type: String },
       createdBy: { type: Schema.Types.ObjectId, required: true },
@@ -169,10 +166,8 @@ module.exports.createMongoInstance = async () => {
   const Calculator = mongoose.model("Calculator", calculatorSchema);
   const Tag = mongoose.model("Tag", tagSchema);
 
-  const APP_DEFAULT_ADMIN_EMAIL =
-    process.env.APP_DEFAULT_ADMIN_EMAIL || "devlinpadayachee@gmail.com";
-  const APP_DEFAULT_ADMIN_PASSWORD =
-    process.env.APP_DEFAULT_ADMIN_PASSWORD || "Sepiroth6043@";
+  const APP_DEFAULT_ADMIN_EMAIL = process.env.APP_DEFAULT_ADMIN_EMAIL || "devlinpadayachee@gmail.com";
+  const APP_DEFAULT_ADMIN_PASSWORD = process.env.APP_DEFAULT_ADMIN_PASSWORD || "Sepiroth6043@";
   const defaultAdminUser = await User.findOne({
     email: APP_DEFAULT_ADMIN_EMAIL,
   });
@@ -191,9 +186,7 @@ module.exports.createMongoInstance = async () => {
     if (adminUser) {
       console.log("Admin user created:", APP_DEFAULT_ADMIN_EMAIL);
     } else {
-      console.log(
-        "An error occured when trying to create the default admin user"
-      );
+      console.log("An error occured when trying to create the default admin user");
     }
   } else {
     console.log("Skipped admin creation");
@@ -324,15 +317,9 @@ module.exports.createMailerQueueInstance = async () => {
     return { mailerQueue };
   } catch (error) {
     if (process.env.NODE_ENV === "production" && process.env.REDIS_URL) {
-      console.log(
-        `Failed to connect to Redis mailer queue on ${process.env.REDIS_URL}`
-      );
+      console.log(`Failed to connect to Redis mailer queue on ${process.env.REDIS_URL}`);
     } else {
-      console.log(
-        `Failed to connect to Redis mailer queue on ${
-          process.env.APP_MAILER_QUEUE_REDIS_URL || "127.0.0.1"
-        }`
-      );
+      console.log(`Failed to connect to Redis mailer queue on ${process.env.APP_MAILER_QUEUE_REDIS_URL || "127.0.0.1"}`);
     }
   }
 };
@@ -361,11 +348,7 @@ function sendMail(to, subject, html, attachments) {
     console.log({
       host: process.env.APP_MAILER_SMTP,
       port: parseInt(process.env.APP_MAILER_PORT),
-      secure:
-        process.env.APP_MAILER_SECURE &&
-        process.env.APP_MAILER_SECURE === "true"
-          ? true
-          : false,
+      secure: process.env.APP_MAILER_SECURE && process.env.APP_MAILER_SECURE === "true" ? true : false,
       auth: {
         user: process.env.APP_MAILER_USERNAME,
         pass: process.env.APP_MAILER_PASSWORD,
@@ -375,11 +358,7 @@ function sendMail(to, subject, html, attachments) {
       let transporter = nodemailer.createTransport({
         host: process.env.APP_MAILER_SMTP,
         port: parseInt(process.env.APP_MAILER_PORT),
-        secure:
-          process.env.APP_MAILER_SECURE &&
-          process.env.APP_MAILER_SECURE === "true"
-            ? true
-            : false,
+        secure: process.env.APP_MAILER_SECURE && process.env.APP_MAILER_SECURE === "true" ? true : false,
         auth: {
           user: process.env.APP_MAILER_USERNAME,
           pass: process.env.APP_MAILER_PASSWORD,
@@ -395,18 +374,14 @@ function sendMail(to, subject, html, attachments) {
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
           console.log(error, info);
-          return reject(
-            `An error occurred while tring to send mail to ${to}: ${error.message}`
-          );
+          return reject(`An error occurred while tring to send mail to ${to}: ${error.message}`);
         }
         transporter.close();
         return resolve(`Mail sent: ${JSON.stringify(info)}`);
       });
     } catch (e) {
       console.log(e);
-      return reject(
-        `An error occurred while tring to send mail to ${to}: ${e.message}`
-      );
+      return reject(`An error occurred while tring to send mail to ${to}: ${e.message}`);
     }
   });
 }

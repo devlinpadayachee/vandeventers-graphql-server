@@ -6,7 +6,7 @@ const typeDefs = gql`
     name: String!
     user: ID!
     docClass: String!
-    category: ID!
+    category: ID
     documentLink: String!
     documentFileName: String!
     createdBy: ID!
@@ -34,7 +34,7 @@ const typeDefs = gql`
     name: String!
     user: ID!
     docClass: String!
-    category: ID!
+    category: ID
     documentLink: String!
     documentFileName: String!
     createdBy: ID!

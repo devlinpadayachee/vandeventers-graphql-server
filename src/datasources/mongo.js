@@ -1,8 +1,4 @@
-const {
-  AuthenticationError,
-  UserInputError,
-  ApolloError,
-} = require("apollo-server-express");
+const { AuthenticationError, UserInputError, ApolloError } = require("apollo-server-express");
 const { DataSource } = require("apollo-datasource");
 const isEmail = require("isemail");
 
@@ -38,13 +34,8 @@ class mongoAPI extends DataSource {
       if (skip >= count) {
         skip = 0;
       }
-      const records = await this.User.find(query)
-        .limit(limit)
-        .skip(skip)
-        .sort({ createdAt: -1 });
-      return records.length > 0
-        ? { records, count }
-        : { records: [], count: 0 };
+      const records = await this.User.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
+      return records.length > 0 ? { records, count } : { records: [], count: 0 };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -67,9 +58,7 @@ class mongoAPI extends DataSource {
       const updatedUser = await this.User.findOneAndUpdate({ _id: id }, args, {
         new: true,
       });
-      return updatedUser
-        ? { id, updated: true, user: updatedUser }
-        : { id, updated: false, user: null };
+      return updatedUser ? { id, updated: true, user: updatedUser } : { id, updated: false, user: null };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -79,9 +68,7 @@ class mongoAPI extends DataSource {
   async deleteUser(id) {
     try {
       const deletedUser = await this.User.deleteOne({ _id: id });
-      return deletedUser.deletedCount > 0
-        ? { id, deleted: true, user: deletedUser }
-        : { id, deleted: false, user: null };
+      return deletedUser.deletedCount > 0 ? { id, deleted: true, user: deletedUser } : { id, deleted: false, user: null };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -94,9 +81,7 @@ class mongoAPI extends DataSource {
       const user = await this.User.findOne({ resetToken: resetToken });
       return user ? user : null;
     } catch (e) {
-      console.log(
-        "Oops Something went wrong with finding the user by reset token"
-      );
+      console.log("Oops Something went wrong with finding the user by reset token");
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
     }
   }
@@ -129,13 +114,8 @@ class mongoAPI extends DataSource {
       if (skip >= count) {
         skip = 0;
       }
-      const records = await this.Document.find(query)
-        .limit(limit)
-        .skip(skip)
-        .sort({ createdAt: -1 });
-      return records.length > 0
-        ? { records, count }
-        : { records: [], count: 0 };
+      const records = await this.Document.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
+      return records.length > 0 ? { records, count } : { records: [], count: 0 };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -155,14 +135,8 @@ class mongoAPI extends DataSource {
   async updateDocument(args) {
     try {
       const id = args.id;
-      const updatedDocument = await this.Document.findOneAndUpdate(
-        { _id: id },
-        args,
-        { new: true }
-      );
-      return updatedDocument
-        ? { id, updated: true, document: updatedDocument }
-        : { id, updated: false, document: null };
+      const updatedDocument = await this.Document.findOneAndUpdate({ _id: id }, args, { new: true });
+      return updatedDocument ? { id, updated: true, document: updatedDocument } : { id, updated: false, document: null };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -172,9 +146,7 @@ class mongoAPI extends DataSource {
   async deleteDocument(id) {
     try {
       const deletedDocument = await this.Document.deleteOne({ _id: id });
-      return deletedDocument.deletedCount > 0
-        ? { id, deleted: true, document: deletedDocument }
-        : { id, deleted: false, document: null };
+      return deletedDocument.deletedCount > 0 ? { id, deleted: true, document: deletedDocument } : { id, deleted: false, document: null };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -198,13 +170,9 @@ class mongoAPI extends DataSource {
       if (skip >= count) {
         skip = 0;
       }
-      const records = await this.Category.find(query)
-        .limit(limit)
-        .skip(skip)
-        .sort({ createdAt: -1 });
-      return records.length > 0
-        ? { records, count }
-        : { records: [], count: 0 };
+      const records = await this.Category.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
+      console.log(records);
+      return records.length > 0 ? { records, count } : { records: [], count: 0 };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -224,14 +192,8 @@ class mongoAPI extends DataSource {
   async updateCategory(args) {
     try {
       const id = args.id;
-      const updatedCategory = await this.Category.findOneAndUpdate(
-        { _id: id },
-        args,
-        { new: true }
-      );
-      return updatedCategory
-        ? { id, updated: true, category: updatedCategory }
-        : { id, updated: false, category: null };
+      const updatedCategory = await this.Category.findOneAndUpdate({ _id: id }, args, { new: true });
+      return updatedCategory ? { id, updated: true, category: updatedCategory } : { id, updated: false, category: null };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -241,9 +203,7 @@ class mongoAPI extends DataSource {
   async deleteCategory(id) {
     try {
       const deletedCategory = await this.Category.deleteOne({ _id: id });
-      return deletedCategory.deletedCount > 0
-        ? { id, deleted: true, category: deletedCategory }
-        : { id, deleted: false, category: null };
+      return deletedCategory.deletedCount > 0 ? { id, deleted: true, category: deletedCategory } : { id, deleted: false, category: null };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -267,13 +227,8 @@ class mongoAPI extends DataSource {
       if (skip >= count) {
         skip = 0;
       }
-      const records = await this.InventoryItem.find(query)
-        .limit(limit)
-        .skip(skip)
-        .sort({ createdAt: -1 });
-      return records.length > 0
-        ? { records, count }
-        : { records: [], count: 0 };
+      const records = await this.InventoryItem.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
+      return records.length > 0 ? { records, count } : { records: [], count: 0 };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -293,14 +248,8 @@ class mongoAPI extends DataSource {
   async updateInventoryItem(args) {
     try {
       const id = args.id;
-      const updatedInventoryItem = await this.InventoryItem.findOneAndUpdate(
-        { _id: id },
-        args,
-        { new: true }
-      );
-      return updatedInventoryItem
-        ? { id, updated: true, inventoryItem: updatedInventoryItem }
-        : { id, updated: false, inventoryItem: null };
+      const updatedInventoryItem = await this.InventoryItem.findOneAndUpdate({ _id: id }, args, { new: true });
+      return updatedInventoryItem ? { id, updated: true, inventoryItem: updatedInventoryItem } : { id, updated: false, inventoryItem: null };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -312,9 +261,7 @@ class mongoAPI extends DataSource {
       const deletedInventoryItem = await this.InventoryItem.deleteOne({
         _id: id,
       });
-      return deletedInventoryItem.deletedCount > 0
-        ? { id, deleted: true, inventoryItem: deletedInventoryItem }
-        : { id, deleted: false, inventoryItem: null };
+      return deletedInventoryItem.deletedCount > 0 ? { id, deleted: true, inventoryItem: deletedInventoryItem } : { id, deleted: false, inventoryItem: null };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -338,13 +285,8 @@ class mongoAPI extends DataSource {
       if (skip >= count) {
         skip = 0;
       }
-      const records = await this.Calculator.find(query)
-        .limit(limit)
-        .skip(skip)
-        .sort({ createdAt: -1 });
-      return records.length > 0
-        ? { records, count }
-        : { records: [], count: 0 };
+      const records = await this.Calculator.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
+      return records.length > 0 ? { records, count } : { records: [], count: 0 };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -364,16 +306,10 @@ class mongoAPI extends DataSource {
   async updateCalculator(args) {
     try {
       const id = args.id;
-      const updatedCalculator = await this.Calculator.findOneAndUpdate(
-        { _id: id },
-        args,
-        {
-          new: true,
-        }
-      );
-      return updatedCalculator
-        ? { id, updated: true, calculator: updatedCalculator }
-        : { id, updated: false, calculator: null };
+      const updatedCalculator = await this.Calculator.findOneAndUpdate({ _id: id }, args, {
+        new: true,
+      });
+      return updatedCalculator ? { id, updated: true, calculator: updatedCalculator } : { id, updated: false, calculator: null };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -383,9 +319,7 @@ class mongoAPI extends DataSource {
   async deleteCalculator(id) {
     try {
       const deletedCalculator = await this.Calculator.deleteOne({ _id: id });
-      return deletedCalculator.deletedCount > 0
-        ? { id, deleted: true, calculator: deletedCalculator }
-        : { id, deleted: false, calculator: null };
+      return deletedCalculator.deletedCount > 0 ? { id, deleted: true, calculator: deletedCalculator } : { id, deleted: false, calculator: null };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -409,13 +343,8 @@ class mongoAPI extends DataSource {
       if (skip >= count) {
         skip = 0;
       }
-      const records = await this.Tag.find(query)
-        .limit(limit)
-        .skip(skip)
-        .sort({ createdAt: -1 });
-      return records.length > 0
-        ? { records, count }
-        : { records: [], count: 0 };
+      const records = await this.Tag.find(query).limit(limit).skip(skip).sort({ createdAt: -1 });
+      return records.length > 0 ? { records, count } : { records: [], count: 0 };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -438,9 +367,7 @@ class mongoAPI extends DataSource {
       const updatedTag = await this.Tag.findOneAndUpdate({ _id: id }, args, {
         new: true,
       });
-      return updatedTag
-        ? { id, updated: true, tag: updatedTag }
-        : { id, updated: false, tag: null };
+      return updatedTag ? { id, updated: true, tag: updatedTag } : { id, updated: false, tag: null };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});
@@ -450,9 +377,7 @@ class mongoAPI extends DataSource {
   async deleteTag(id) {
     try {
       const deletedTag = await this.Tag.deleteOne({ _id: id });
-      return deletedTag.deletedCount > 0
-        ? { id, deleted: true, tag: deletedTag }
-        : { id, deleted: false, tag: null };
+      return deletedTag.deletedCount > 0 ? { id, deleted: true, tag: deletedTag } : { id, deleted: false, tag: null };
     } catch (e) {
       console.log("Oops Something went wrong", e);
       throw new ApolloError(e.message, "ACTION_NOT_COMPLETED", {});

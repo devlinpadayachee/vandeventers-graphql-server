@@ -7,6 +7,7 @@ const typeDefs = gql`
     user: ID!
     docClass: String!
     category: ID
+    categoryName: String
     documentLink: String!
     documentFileName: String!
     createdBy: ID!

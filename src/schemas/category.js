@@ -6,6 +6,7 @@ const typeDefs = gql`
     name: String!
     docClass: String!
     parent: ID
+    parentName: String
     createdBy: ID!
     createdAt: Float!
     updatedAt: Float!

@@ -1,8 +1,4 @@
-const {
-  AuthenticationError,
-  UserInputError,
-  ApolloError,
-} = require("apollo-server-express");
+const { AuthenticationError, UserInputError, ApolloError } = require("apollo-server-express");
 
 module.exports = {
   Query: {
@@ -12,47 +8,32 @@ module.exports = {
     },
     categories: async (parent, args, context, info) => {
       console.log("Got a query for categories");
-      const categories = await context.dataSources.mongoAPI.categories(
-        args.limit,
-        args.skip,
-        args.query
-      );
+      const categories = await context.dataSources.mongoAPI.categories(args.limit, args.skip, args.query);
       return categories;
     },
   },
   Mutation: {
     createCategory: async (parent, args, context, info) => {
-      const category = await context.dataSources.mongoAPI.createCategory(
-        args.category
-      );
+      const category = await context.dataSources.mongoAPI.createCategory(args.category);
       if (category) return category;
-      throw new ApolloError(
-        "Could not create category",
-        "ACTION_NOT_COMPLETED",
-        {}
-      );
+      throw new ApolloError("Could not create category", "ACTION_NOT_COMPLETED", {});
     },
     updateCategory: async (parent, args, context, info) => {
-      const updated = await context.dataSources.mongoAPI.updateCategory(
-        args.category
-      );
+      const updated = await context.dataSources.mongoAPI.updateCategory(args.category);
       if (updated) return updated;
-      throw new ApolloError(
-        "Could not update category",
-        "ACTION_NOT_COMPLETED",
-        {}
-      );
+      throw new ApolloError("Could not update category", "ACTION_NOT_COMPLETED", {});
     },
     deleteCategory: async (parent, args, context, info) => {
-      const deleted = await context.dataSources.mongoAPI.deleteCategory(
-        args.id
-      );
+      const deleted = await context.dataSources.mongoAPI.deleteCategory(args.id);
       return deleted;
-      throw new ApolloError(
-        "Could not delete category",
-        "ACTION_NOT_COMPLETED",
-        {}
-      );
+      throw new ApolloError("Could not delete category", "ACTION_NOT_COMPLETED", {});
+    },
+  },
+  Category: {
+    parentName: async (parent, args, context, info) => {
+      const parentCategory = await context.dataSources.mongoAPI.category(parent.parent);
+      if (!parentCategory) return null;
+      return parentCategory.name;
     },
   },
 };

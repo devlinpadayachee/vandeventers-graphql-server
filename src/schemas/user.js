@@ -60,6 +60,14 @@ const typeDefs = gql`
     industry: String
     role: Role!
     branch: ID
+    pushToken: String
+    location: JSON
+    metaData: JSON
+    profilePicture: String
+    loginCounter: Int
+    resetToken: String
+    showAsContact: Boolean
+    jobTitle: String
   }
 
   input UserUpdateInput {

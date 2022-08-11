@@ -57,6 +57,7 @@ module.exports.createMongoInstance = async () => {
       fullAddress: { type: String },
       telNumber: { type: String },
       rating: Number,
+      priority: { type: Number, default: 0 },
       email: { type: String, required: true, index: true, unique: true },
       bio: { type: String },
       title: { type: String },

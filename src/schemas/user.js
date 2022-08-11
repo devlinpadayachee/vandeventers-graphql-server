@@ -15,6 +15,7 @@ const typeDefs = gql`
     industry: String
     bio: String
     rating: Int
+    priority: Int
     role: Role!
     pushToken: String
     location: JSON
@@ -54,6 +55,7 @@ const typeDefs = gql`
     fullAddress: String
     telNumber: String
     rating: Int
+    priority: Int
     email: String!
     bio: String
     title: String
@@ -79,6 +81,7 @@ const typeDefs = gql`
     fullAddress: String
     telNumber: String
     rating: Int
+    priority: Int
     email: String
     bio: String
     title: String

@@ -63,7 +63,7 @@ module.exports.createMongoInstance = async () => {
       title: { type: String },
       industry: { type: String },
       role: { type: String, required: true, enum: ["admin", "user"] },
-      branch: { type: String },
+      branch: { type: String, default: "jhb" },
       pushToken: { type: String },
       location: { type: Object },
       metaData: { type: Object },

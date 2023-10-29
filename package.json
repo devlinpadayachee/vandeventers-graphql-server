@@ -19,7 +19,7 @@
     "bcrypt": "^4.0.1",
     "body-parser": "^1.19.0",
     "body-parser-xml": "^2.0.0",
-    "bull": "^3.13.0",
+    "bullmq": "^3.15.4",
     "bull-arena": "^2.8.1",
     "dotenv": "^8.2.0",
     "expo-server-sdk": "^3.5.0",

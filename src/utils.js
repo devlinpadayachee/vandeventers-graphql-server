@@ -7,7 +7,9 @@ const Arena = require("bull-arena");
 const isEmail = require("isemail");
 const _ = require("lodash");
 const { Schema } = mongoose;
-var Queue = require("bull");
+var bullmq = require("bullmq");
+var Queue = bullmq.Queue;
+var Worker = bullmq.Worker;
 var firebaseAdmin = require("firebase-admin");
 var firebaseServiceAccount = require("../firebase-service-account.json");
 
@@ -245,82 +247,65 @@ module.exports.verifyToken = (token) => {
 
 module.exports.createMailerQueueInstance = async () => {
   try {
-    var mailerQueue;
-    if (process.env.NODE_ENV === "production" && process.env.REDIS_URL) {
-      mailerQueue = new Queue("mailer-queue", process.env.REDIS_URL);
-    } else {
-      mailerQueue = new Queue("mailer-queue", {
-        redis: {
-          port: parseInt(process.env.APP_MAILER_QUEUE_REDIS_PORT) || 6379,
-          host: process.env.APP_MAILER_QUEUE_REDIS_URL || "127.0.0.1",
-        },
-      });
-    }
+    console.log("Using REDIS Object Config");
+    const config = {
+      port: parseInt(process.env.APP_MAILER_QUEUE_REDIS_PORT) || 6379,
+      host: process.env.APP_MAILER_QUEUE_REDIS_URL || "",
+      username: process.env.APP_MAILER_QUEUE_REDIS_USERNAME || "",
+      password: process.env.APP_MAILER_QUEUE_REDIS_PASSWORD || "",
+      tls: true,
+    };
+    console.log(config);
 
-    function intervalFunc() {
-      try {
-        mailerQueue.clean(3600 * 1000 * 24, "completed");
-        mailerQueue.clean(3600 * 1000 * 24, "failed");
-      } catch (error) {
-        console.log(`Could not clean mailerQueue`);
-      }
-    }
-
-    if (mailerQueue) {
-      setInterval(intervalFunc, 1000 * 60);
-    }
-
-    mailerQueue.process(async (job) => {
-      // console.log("processing job", job);
-      job.progress(0);
-      const {
-        data: { to, subject, html, filename, attachments },
-      } = job;
-      job.progress(20);
-      if (filename) {
-        job.progress(30);
-        const buffer = getPDFBuffer(html);
-        if (buffer) {
-          attachments.push({ filename, content: buffer });
-        }
-        job.progress(40);
-      }
-      var mailResult = undefined;
-      try {
-        job.progress(50);
-        console.log("got passed 50");
-        try {
-          mailResult = await sendMail(to, subject, html, attachments);
-          console.log("mailResult came back", mailResult);
-        } catch (e) {
-          console.log("mailResult", mailResult);
-          console.log(e);
-        }
-
-        job.progress(100);
-        return mailResult;
-      } catch (error) {
-        job.progress(75);
-        throw new Error(error);
-      }
+    const mailerQueue = new Queue("mailer-queue", {
+      connection: config,
     });
-    mailerQueue.on("completed", (job, result) => {
+
+    const worker = new Worker(
+      "mailer-queue",
+      async (job) => {
+        console.log("Mailer job started");
+        job.updateProgress(0);
+        const {
+          data: { to, subject, html, filename = undefined },
+        } = job;
+        job.updateProgress(20);
+        let attachments = [];
+        if (filename) {
+          job.updateProgress(30);
+          const buffer = getPDFBuffer(html);
+          attachments = buffer ? [{ filename, content: buffer }] : [];
+          job.updateProgress(40);
+        }
+        try {
+          job.updateProgress(50);
+          const mailResult = await sendMail(to, subject, html, attachments);
+          job.updateProgress(100);
+          return mailResult;
+        } catch (error) {
+          job.updateProgress(75);
+          throw new Error(error);
+        }
+      },
+      { connection: config }
+    );
+    worker.on("error", (err) => {
+      console.log("Error occured", err);
+    });
+
+    worker.on("completed", (job, result) => {
       console.log(`Mailer job completed with result ${result}`);
     });
 
-    mailerQueue.on("failed", function (job, err) {
-      console.log(err);
-    });
-
-    mailerQueue.on("error", function (error) {
-      console.log(error);
+    worker.on("failed", (job, error) => {
+      console.log(`Mailer job failed with result ${error}`);
     });
     return { mailerQueue };
   } catch (error) {
     if (process.env.NODE_ENV === "production" && process.env.REDIS_URL) {
-      console.log(`Failed to connect to Redis mailer queue on ${process.env.REDIS_URL}`);
+      console.log(`Failed to connect to Redis mailer queue using ${process.env.REDIS_URL}: ${error.message || error}`);
     } else {
-      console.log(`Failed to connect to Redis mailer queue on ${process.env.APP_MAILER_QUEUE_REDIS_URL || "127.0.0.1"}`);
+      console.log(`Failed to connect to Redis mailer queue on ${process.env.APP_MAILER_QUEUE_REDIS_URL || "127.0.0.1"}: : ${error.message || error}`);
     }
   }
 };

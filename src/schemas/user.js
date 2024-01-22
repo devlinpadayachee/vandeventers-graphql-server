@@ -25,6 +25,7 @@ const typeDefs = gql`
     resetToken: String
     showAsContact: Boolean
     jobTitle: String
+    company: String
     createdAt: Float!
     updatedAt: Float!
   }
@@ -70,6 +71,7 @@ const typeDefs = gql`
     resetToken: String
     showAsContact: Boolean
     jobTitle: String
+    company: String
   }
 
   input UserUpdateInput {
@@ -96,6 +98,7 @@ const typeDefs = gql`
     resetToken: String
     showAsContact: Boolean
     jobTitle: String
+    company: String
   }
 
   type UsersResponse {

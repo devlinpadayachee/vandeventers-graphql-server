@@ -1,5 +1,5 @@
 const { AuthenticationError, UserInputError, ApolloError } = require("apollo-server-express");
-const { generateCalculatorHTML, getPDFBuffer } = require("../utils");
+const { generateCalculatorHTML, getPDFBuffer, sendMail } = require("../utils");
 
 module.exports = {
   Query: {
@@ -33,12 +33,6 @@ module.exports = {
         const { to, subject, results } = args;
         console.log(`Sending calculator results to ${to} with subject: ${subject}`);
 
-        // Check if mailAPI is available
-        if (!context.dataSources.mailAPI) {
-          console.error("Mail API not available");
-          throw new Error("Email service is not available");
-        }
-
         // Generate HTML for email and PDF
         const htmlString = generateCalculatorHTML(results);
         console.log("HTML generated successfully");
@@ -53,17 +47,12 @@ module.exports = {
           content: pdfBuffer,
         };
 
-        console.log("Attempting to send email");
-        // Send email with attachment
-        const job = await context.dataSources.mailAPI.sendMail(to, subject, htmlString, [attachment]);
+        console.log("Attempting to send email directly (bypassing queue)");
 
-        // Check if job was created successfully
-        if (!job) {
-          console.error("Failed to create email job - job is null or undefined");
-          throw new Error("Failed to queue email job");
-        }
+        // Send email directly using the utility function instead of the queue
+        const result = await sendMail(to, subject, htmlString, [attachment]);
+        console.log("Email sent successfully:", result);
 
-        console.log("Email job queued successfully:", job.id);
         return {
           success: true,
           message: "Email sent successfully",

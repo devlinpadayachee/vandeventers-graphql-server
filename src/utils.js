@@ -362,15 +362,14 @@ function getPDFBuffer(html) {
 
 function sendMail(to, subject, html, attachments) {
   return new Promise((resolve, reject) => {
-    console.log("Im definitely hitting the send mail function", to, subject);
-    // // console.log("Sending mail", { to, subject, html, attachments });
+    console.log(`Direct email: Sending to ${to} with subject: ${subject}`);
     console.log({
       host: process.env.APP_MAILER_SMTP,
       port: parseInt(process.env.APP_MAILER_PORT),
       secure: process.env.APP_MAILER_SECURE && process.env.APP_MAILER_SECURE === "true" ? true : false,
       auth: {
         user: process.env.APP_MAILER_USERNAME,
-        pass: process.env.APP_MAILER_PASSWORD,
+        pass: "********",
       },
     });
     try {
@@ -383,6 +382,14 @@ function sendMail(to, subject, html, attachments) {
           pass: process.env.APP_MAILER_PASSWORD,
         },
       });
+
+      // Log attachment information but not content
+      const attachmentInfo = attachments?.map((a) => ({
+        filename: a.filename,
+        contentLength: a.content ? Buffer.byteLength(a.content) : "N/A",
+      }));
+      console.log("Attachments:", attachmentInfo);
+
       let mailOptions = {
         from: process.env.APP_MAILER_FROM,
         to,
@@ -390,20 +397,25 @@ function sendMail(to, subject, html, attachments) {
         html,
         attachments,
       };
+
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-          console.log(error, info);
-          return reject(`An error occurred while tring to send mail to ${to}: ${error.message}`);
+          console.error("Email sending error:", error);
+          return reject(`An error occurred while trying to send mail to ${to}: ${error.message}`);
         }
         transporter.close();
-        return resolve(`Mail sent: ${JSON.stringify(info)}`);
+        console.log("Email sent successfully, info:", info.messageId);
+        return resolve(`Mail sent: ${info.messageId}`);
       });
     } catch (e) {
-      console.log(e);
-      return reject(`An error occurred while tring to send mail to ${to}: ${e.message}`);
+      console.error("Exception in sendMail:", e);
+      return reject(`An error occurred while trying to send mail to ${to}: ${e.message}`);
     }
   });
 }
+
+// Export the sendMail function
+module.exports.sendMail = sendMail;
 
 module.exports.getArenaConfig = () => {
   const arenaConfig = Arena(

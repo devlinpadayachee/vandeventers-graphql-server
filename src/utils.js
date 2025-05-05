@@ -305,7 +305,11 @@ module.exports.createMailerQueueInstance = async () => {
     if (process.env.NODE_ENV === "production" && process.env.REDIS_URL) {
       console.log(`Failed to connect to Redis mailer queue using ${process.env.REDIS_URL}: ${error.message || error}`);
     } else {
-      console.log(`Failed to connect to Redis mailer queue on ${process.env.APP_MAILER_QUEUE_REDIS_URL || "127.0.0.1"}: : ${error.message || error}`);
+      console.log(
+        `Failed to connect to Redis mailer queue on ${process.env.APP_MAILER_QUEUE_REDIS_URL || "127.0.0.1"}: : ${
+          error.message || error
+        }`
+      );
     }
   }
 };
@@ -842,4 +846,136 @@ module.exports.getUserOnboardingMailTemplate = (user) => {
       </table>
     </body>
   </html>`;
+};
+
+// Add PDF buffer generation function
+module.exports.getPDFBuffer = (htmlString) => {
+  return new Promise((resolve, reject) => {
+    const options = {
+      format: "A4",
+      orientation: "portrait",
+      type: "pdf",
+      timeout: 100000,
+      width: "930px",
+      height: "1316px",
+    };
+
+    process.env.OPENSSL_CONF = "/dev/null";
+    pdf.create(htmlString, options).toBuffer((err, buffer) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(buffer);
+      }
+    });
+  });
+};
+
+// Format numbers with thousands separator
+module.exports.thousands = (value) => {
+  function floor(value, significance) {
+    return Math.floor(value / significance) * significance;
+  }
+
+  // Check if value is a number or is a string that can be converted to number
+  if (typeof value !== "number") {
+    let test = Number(value);
+    if (isNaN(test)) {
+      return value;
+    }
+  }
+
+  if (!value) return "0";
+  let significanceValue = 10;
+  let formattedValue = parseFloat(value.toString());
+
+  if (formattedValue >= 0 && formattedValue < 100000) {
+    significanceValue = 1;
+  } else {
+    significanceValue = 1000;
+  }
+
+  formattedValue = floor(Math.abs(formattedValue), significanceValue);
+  return formattedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") || "0";
+};
+
+// Generate HTML for calculator results
+module.exports.generateCalculatorHTML = (results) => {
+  const jsonResults = results;
+  const containerStyles = "margin: 0 auto; padding: 20px; background-color: #fff;";
+  const resultStyles = "margin-bottom: 20px;";
+  const labelStyles = "font-weight: bold;";
+  const tableStyles = "width: 100%; border-collapse: collapse; border: 1px solid #e0e0e0;";
+  const footerStyles = "margin-top: 20px; color: #888; font-size: 12px;";
+  const thousands = this.thousands;
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {
+                font-family: Helvetica, sans-serif;
+                font-weight: 300;
+                font-size: 12px;
+                color: #333;
+            }
+            .container {
+                ${containerStyles}
+            }
+            .result {
+                ${resultStyles}
+            }
+            .label {
+                ${labelStyles}
+            }
+            table, th, td {
+                ${tableStyles}
+                text-align: left;
+            }
+            td, th {
+                padding: 5px;
+                vertical-align: center;
+            }
+            .firstTd {
+                width: 50%;
+                text-align: left;
+            }
+            .footer {
+                ${footerStyles}
+            }
+        </style>
+    </head>
+    <body>
+      <div class="container">
+        <img src="https://firebasestorage.googleapis.com/v0/b/phoenix-pwa.appspot.com/o/headerbar.jpg?alt=media&token=c677157c-e791-4df9-a4aa-b72c3bad94bd" alt="Header Image" style="width: 100%; height: auto;">
+        <h2 style="margin-top: 20px; margin-bottom: 5px;">${jsonResults.heading}</h3>
+        ${jsonResults.tables
+          .map(
+            (table) => `
+              <h3 style="margin-top: 20px; margin-bottom: 5px;">${table.heading}</h4>
+              <table>
+                ${table.rows
+                  .map(
+                    (row) => `
+                  <tr>
+                    <td class="firstTd"><span style="font-weight: ${row.bold ? "bold" : "normal"};">${
+                      row.label
+                    }:</span></td>
+                    <td style="font-weight: ${row.bold ? "bold" : "normal"};">${row.prefix || ""}${thousands(
+                      row.value
+                    )}${row.suffix || ""}</td>
+                  </tr>
+                `
+                  )
+                  .join("")}
+              </table>
+            `
+          )
+          .join("")}
+        <p>${jsonResults.summaryText || ""}</p>
+        <p class="footer">${jsonResults.footerText || ""}</p>
+      </div>
+    </body>
+    </html>`;
 };

@@ -17,10 +17,10 @@ const typeDefs = gql`
 
   extend type Mutation {
     createCalculator(calculator: CalculatorCreateInput): Calculator!
-    updateCalculator(
-      calculator: CalculatorUpdateInput
-    ): CalculatorUpdatedResponse!
+    updateCalculator(calculator: CalculatorUpdateInput): CalculatorUpdatedResponse!
     deleteCalculator(id: ID!): CalculatorDeletedResponse!
+    sendCalculatorResults(to: String!, subject: String!, results: JSON!): SendCalculatorResultsResponse!
+    generateCalculatorPDF(results: JSON!): GenerateCalculatorPDFResponse!
   }
 
   input CalculatorCreateInput {
@@ -50,6 +50,17 @@ const typeDefs = gql`
     id: ID!
     deleted: Boolean!
     calculator: Calculator
+  }
+
+  type SendCalculatorResultsResponse {
+    success: Boolean!
+    message: String
+  }
+
+  type GenerateCalculatorPDFResponse {
+    success: Boolean!
+    pdfBase64: String
+    message: String
   }
 `;
 

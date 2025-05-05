@@ -247,70 +247,99 @@ module.exports.verifyToken = (token) => {
 
 module.exports.createMailerQueueInstance = async () => {
   try {
-    console.log("Using REDIS Object Config");
+    console.log("Initializing mailer queue with Redis");
+
+    // Get Redis configuration from environment
     const config = {
       port: parseInt(process.env.APP_MAILER_QUEUE_REDIS_PORT) || 6379,
-      host: process.env.APP_MAILER_QUEUE_REDIS_URL || "",
+      host: process.env.APP_MAILER_QUEUE_REDIS_URL || "127.0.0.1",
       username: process.env.APP_MAILER_QUEUE_REDIS_USERNAME || "",
       password: process.env.APP_MAILER_QUEUE_REDIS_PASSWORD || "",
       tls: true,
     };
-    console.log(config);
 
+    console.log("Redis connection config:", {
+      port: config.port,
+      host: config.host,
+      username: config.username ? "****" : "(none)",
+      password: config.password ? "****" : "(none)",
+      tls: config.tls,
+    });
+
+    if (!config.host) {
+      console.error("Redis host not configured. Mail service will not be available.");
+      return { mailerQueue: null };
+    }
+
+    // Create the queue
     const mailerQueue = new Queue("mailer-queue", {
       connection: config,
     });
 
+    // Create the worker to process queue items
     const worker = new Worker(
       "mailer-queue",
       async (job) => {
-        console.log("Mailer job started");
+        console.log(`Mailer job ${job.id} started`);
         job.updateProgress(0);
+
+        // Extract job data
         const {
-          data: { to, subject, html, filename = undefined },
+          data: { to, subject, html, attachments = [] },
         } = job;
+
+        console.log(`Preparing to send email to ${to} with subject: ${subject}`);
         job.updateProgress(20);
-        let attachments = [];
-        if (filename) {
-          job.updateProgress(30);
-          const buffer = getPDFBuffer(html);
-          attachments = buffer ? [{ filename, content: buffer }] : [];
-          job.updateProgress(40);
-        }
+
         try {
           job.updateProgress(50);
+          console.log("Sending email...");
           const mailResult = await sendMail(to, subject, html, attachments);
           job.updateProgress(100);
+          console.log(`Email sent successfully to ${to}`);
           return mailResult;
         } catch (error) {
           job.updateProgress(75);
-          throw new Error(error);
+          console.error(`Failed to send email to ${to}:`, error);
+          throw new Error(`Error sending email: ${error.message}`);
         }
       },
-      { connection: config }
+      {
+        connection: config,
+        concurrency: 5, // Process up to 5 jobs at a time
+      }
     );
+
+    // Set up event handlers
     worker.on("error", (err) => {
-      console.log("Error occured", err);
+      console.error("Worker error:", err);
     });
 
     worker.on("completed", (job, result) => {
-      console.log(`Mailer job completed with result ${result}`);
+      console.log(`Mailer job ${job.id} completed successfully`);
     });
 
     worker.on("failed", (job, error) => {
-      console.log(`Mailer job failed with result ${error}`);
+      console.error(`Mailer job ${job.id} failed:`, error);
     });
+
+    console.log("Mailer queue initialized successfully");
     return { mailerQueue };
   } catch (error) {
+    console.error("Failed to initialize mailer queue:", error);
+
     if (process.env.NODE_ENV === "production" && process.env.REDIS_URL) {
-      console.log(`Failed to connect to Redis mailer queue using ${process.env.REDIS_URL}: ${error.message || error}`);
+      console.error(`Redis connection failed using ${process.env.REDIS_URL}`);
     } else {
-      console.log(
-        `Failed to connect to Redis mailer queue on ${process.env.APP_MAILER_QUEUE_REDIS_URL || "127.0.0.1"}: : ${
-          error.message || error
+      console.error(
+        `Redis connection failed on ${process.env.APP_MAILER_QUEUE_REDIS_URL || "127.0.0.1"}:${
+          process.env.APP_MAILER_QUEUE_REDIS_PORT || 6379
         }`
       );
     }
+
+    // Return empty mailerQueue to prevent null reference errors
+    return { mailerQueue: null };
   }
 };
 

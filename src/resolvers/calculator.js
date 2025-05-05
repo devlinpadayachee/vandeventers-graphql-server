@@ -31,25 +31,39 @@ module.exports = {
     sendCalculatorResults: async (parent, args, context, info) => {
       try {
         const { to, subject, results } = args;
+        console.log(`Sending calculator results to ${to} with subject: ${subject}`);
+
+        // Check if mailAPI is available
+        if (!context.dataSources.mailAPI) {
+          console.error("Mail API not available");
+          throw new Error("Email service is not available");
+        }
 
         // Generate HTML for email and PDF
         const htmlString = generateCalculatorHTML(results);
+        console.log("HTML generated successfully");
 
         // Generate PDF buffer
         const pdfBuffer = await getPDFBuffer(htmlString);
+        console.log("PDF buffer generated successfully");
 
-        // Use the mailAPI like in user.js
-        var job = await context.dataSources.mailAPI.sendMail(to, subject, htmlString, [
-          {
-            filename: `${subject}.pdf`,
-            content: pdfBuffer,
-          },
-        ]);
+        // Prepare attachment
+        const attachment = {
+          filename: `${subject}.pdf`,
+          content: pdfBuffer,
+        };
 
+        console.log("Attempting to send email");
+        // Send email with attachment
+        const job = await context.dataSources.mailAPI.sendMail(to, subject, htmlString, [attachment]);
+
+        // Check if job was created successfully
         if (!job) {
+          console.error("Failed to create email job - job is null or undefined");
           throw new Error("Failed to queue email job");
         }
 
+        console.log("Email job queued successfully:", job.id);
         return {
           success: true,
           message: "Email sent successfully",

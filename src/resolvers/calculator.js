@@ -38,18 +38,17 @@ module.exports = {
         // Generate PDF buffer
         const pdfBuffer = await getPDFBuffer(htmlString);
 
-        // Set up email options
-        const mail = await context.mailerQueue.add({
-          to: to,
-          subject: subject,
-          html: htmlString,
-          attachments: [
-            {
-              filename: `${subject}.pdf`,
-              content: pdfBuffer,
-            },
-          ],
-        });
+        // Use the mailAPI like in user.js
+        var job = await context.dataSources.mailAPI.sendMail(to, subject, htmlString, [
+          {
+            filename: `${subject}.pdf`,
+            content: pdfBuffer,
+          },
+        ]);
+
+        if (!job) {
+          throw new Error("Failed to queue email job");
+        }
 
         return {
           success: true,

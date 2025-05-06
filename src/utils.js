@@ -943,11 +943,6 @@ module.exports.thousands = (value) => {
 // Generate HTML for calculator results
 module.exports.generateCalculatorHTML = (results) => {
   const jsonResults = results;
-  const containerStyles = "margin: 0 auto; padding: 20px; background-color: #fff;";
-  const resultStyles = "margin-bottom: 20px;";
-  const labelStyles = "font-weight: bold;";
-  const tableStyles = "width: 100%; border-collapse: collapse; border: 1px solid #e0e0e0;";
-  const footerStyles = "margin-top: 20px; color: #888; font-size: 12px;";
   const thousands = this.thousands;
 
   return `
@@ -956,56 +951,103 @@ module.exports.generateCalculatorHTML = (results) => {
     <head>
         <style>
             body {
-                font-family: Helvetica, sans-serif;
-                font-weight: 300;
-                font-size: 12px;
+                font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+                line-height: 1.6;
                 color: #333;
+                margin: 0;
+                padding: 0;
+                background-color: #fff;
             }
             .container {
-                ${containerStyles}
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #fff;
             }
-            .result {
-                ${resultStyles}
+            .logo-container {
+                text-align: center;
+                margin-bottom: 20px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #eee;
             }
-            .label {
-                ${labelStyles}
+            .logo {
+                max-width: 300px;
+                height: auto;
+                display: inline-block;
             }
-            table, th, td {
-                ${tableStyles}
-                text-align: left;
+            h2 {
+                color: #33465e;
+                text-align: center;
+                font-size: 22px;
+                margin: 25px 0 20px 0;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #eee;
             }
-            td, th {
-                padding: 5px;
-                vertical-align: center;
+            h4 {
+                color: #b3a369;
+                font-size: 18px;
+                margin: 20px 0 10px 0;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 15px 0;
+                border: 1px solid #e0e0e0;
+            }
+            td {
+                padding: 10px;
+                vertical-align: top;
+                border-bottom: 1px solid #eee;
+            }
+            tr:last-child td {
+                border-bottom: none;
+            }
+            tr:nth-child(even) {
+                background-color: #f9f9f9;
             }
             .firstTd {
-                width: 50%;
-                text-align: left;
+                width: 60%;
+            }
+            .bold {
+                font-weight: bold;
+                color: #33465e;
+            }
+            .value {
+                text-align: right;
             }
             .footer {
-                ${footerStyles}
+                margin-top: 30px;
+                padding-top: 20px;
+                border-top: 1px solid #eee;
+                font-size: 12px;
+                color: #666;
+                text-align: center;
             }
         </style>
     </head>
     <body>
       <div class="container">
-        <img src="https://vandeventers-graphql-client.onrender.com/img/vv_logo.bbe6a182.png?alt=media&token=c677157c-e791-4df9-a4aa-b72c3bad94bd" alt="Header Image" style="width: auto; max-width: 400px; height: auto; display: block; margin: 0 auto;">
-        <h2 style="margin-top: 20px; margin-bottom: 5px;">${jsonResults.heading}</h3>
+        <div class="logo-container">
+          <img src="https://vandeventers-graphql-client.onrender.com/img/vv_logo.bbe6a182.png?alt=media&token=c677157c-e791-4df9-a4aa-b72c3bad94bd" alt="Van Deventer & Van Deventer" class="logo">
+        </div>
+
+        <h2>${jsonResults.heading}</h2>
+
         ${jsonResults.tables
           .map(
             (table) => `
-              <h3 style="margin-top: 20px; margin-bottom: 5px;">${table.heading}</h4>
+              <h4>${table.heading}</h4>
               <table>
                 ${table.rows
                   .map(
                     (row) => `
                   <tr>
-                    <td class="firstTd"><span style="font-weight: ${row.bold ? "bold" : "normal"};">${
-                      row.label
-                    }:</span></td>
-                    <td style="font-weight: ${row.bold ? "bold" : "normal"};">${row.prefix || ""}${thousands(
-                      row.value
-                    )}${row.suffix || ""}</td>
+                    <td class="firstTd ${row.bold ? "bold" : ""}">
+                      ${row.label}:
+                    </td>
+                    <td class="value ${row.bold ? "bold" : ""}">
+                      ${row.prefix || ""}${thousands(row.value)}${row.suffix || ""}
+                    </td>
                   </tr>
                 `
                   )
@@ -1014,8 +1056,15 @@ module.exports.generateCalculatorHTML = (results) => {
             `
           )
           .join("")}
-        <p>${jsonResults.summaryText || ""}</p>
-        <p class="footer">${jsonResults.footerText || ""}</p>
+
+        ${jsonResults.summaryText ? `<p>${jsonResults.summaryText}</p>` : ""}
+
+        <div class="footer">
+          <p>${
+            jsonResults.footerText || "These calculations are estimates and may vary based on actual rates and fees."
+          }</p>
+          <p>Generated by Van Deventer's Mobile App</p>
+        </div>
       </div>
     </body>
     </html>`;

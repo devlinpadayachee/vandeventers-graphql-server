@@ -989,7 +989,7 @@ module.exports.generateCalculatorHTML = (results) => {
     </head>
     <body>
       <div class="container">
-        <img src="https://firebasestorage.googleapis.com/v0/b/phoenix-pwa.appspot.com/o/headerbar.jpg?alt=media&token=c677157c-e791-4df9-a4aa-b72c3bad94bd" alt="Header Image" style="width: 100%; height: auto;">
+        <img src="https://vandeventers-graphql-client.onrender.com/img/vv_logo.bbe6a182.png?alt=media&token=c677157c-e791-4df9-a4aa-b72c3bad94bd" alt="Header Image" style="width: 100%; height: auto;">
         <h2 style="margin-top: 20px; margin-bottom: 5px;">${jsonResults.heading}</h3>
         ${jsonResults.tables
           .map(
